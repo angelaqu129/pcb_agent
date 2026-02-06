@@ -1,0 +1,25 @@
+{
+  "allowlist":
+    [
+        { "lib": "Device.kicad_sym", "symbol": "R", "ref": "R" },
+        { "lib": "Device.kicad_sym", "symbol": "C", "ref": "C" },
+        { "lib": "Device.kicad_sym", "symbol": "L", "ref": "L" },
+
+        { "lib": "Device.kicad_sym", "symbol": "R_Potentiometer", "ref": "RV" },
+        { "lib": "Device.kicad_sym", "symbol": "FerriteBead", "ref": "FB" },
+        { "lib": "Device.kicad_sym", "symbol": "Crystal", "ref": "Y" },
+        { "lib": "Device.kicad_sym", "symbol": "Resonator", "ref": "Y" },
+
+        { "lib": "RF_Module.kicad_sym", "symbol": "ESP32-S3-MINI-1", "ref": "U" },
+
+        { "lib": "power.kicad_sym", "symbol": "+5V", "ref": "#PWR" },
+        { "lib": "power.kicad_sym", "symbol": "+3V3", "ref": "#PWR" },
+        { "lib": "power.kicad_sym", "symbol": "GND", "ref": "#PWR" },
+
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x02", "ref": "J" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x03", "ref": "J" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x04", "ref": "J" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x05", "ref": "J" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x06", "ref": "J" }
+    ]
+}

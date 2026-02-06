@@ -109,11 +109,11 @@ def _parse_property(symbol_def: str, prop_name: str) -> Tuple[float, float, int]
     return px, py, prot
 
 
-def _rotate_translate(px: float, py: float, rot_deg: int, x: float, y: float) -> Tuple[float, float]:
+def _rotate_translate(px: float, py: float, rot_deg: int, x: float, y: float) -> tuple[float, float]:
     theta = math.radians(rot_deg % 360)
     cx = px * math.cos(theta) - py * math.sin(theta)
     cy = px * math.sin(theta) + py * math.cos(theta)
-    return x + cx, y + cy
+    return x + cx, y - cy
 
 def place_symbol(sch_path: str | Path, lib_file: str | Path, symbol_name: str, ref_des: str, 
                 x: float, y: float, rot: int = 0, value: str | None = None, footprint: str = "") -> str:
