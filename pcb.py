@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 import json
 import subprocess
 import pcbnew
@@ -181,7 +182,7 @@ def autoroute_with_freerouting(board: pcbnew.BOARD, project_dir: Path, timeout_s
     print("Routing imported successfully")
 
 
-def main(project_path_str: str, llm_output1_path_arg: str | None = None):
+def main(project_path_str: str, llm_output1_path_arg: Optional[str] = None):
     """Main function to process PCB layout. If llm_output1_path_arg is set and exists, place footprints from schematic; else relayout with min spacing."""
     project_path = Path(project_path_str)
     print("project_path:", project_path)
