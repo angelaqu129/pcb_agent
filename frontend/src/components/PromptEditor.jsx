@@ -1,18 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaPlay, FaSpinner } from "react-icons/fa";
 import "./PromptEditor.css";
 
-const PromptEditor = ({ onGenerate, onGeneratePCB, isGenerating }) => {
-  const [prompt, setPrompt] = useState("");
-
+const PromptEditor = ({
+  onGenerate,
+  onGeneratePCB,
+  isGeneratingSchematic,
+  isGeneratingPCB,
+  prompt,
+  setPrompt,
+}) => {
   const handleGenerate = () => {
-    if (prompt.trim() && !isGenerating) {
+    if (prompt.trim() && !isGeneratingSchematic && !isGeneratingPCB) {
       onGenerate(prompt);
     }
   };
 
   const handleGeneratePCB = () => {
-    if (prompt.trim() && !isGenerating && onGeneratePCB) {
+    if (
+      prompt.trim() &&
+      !isGeneratingSchematic &&
+      !isGeneratingPCB &&
+      onGeneratePCB
+    ) {
       onGeneratePCB(prompt);
     }
   };
@@ -38,9 +48,11 @@ const PromptEditor = ({ onGenerate, onGeneratePCB, isGenerating }) => {
           <button
             className="generate-btn"
             onClick={handleGenerate}
-            disabled={isGenerating || !prompt.trim()}
+            disabled={
+              isGeneratingSchematic || isGeneratingPCB || !prompt.trim()
+            }
           >
-            {isGenerating ? (
+            {isGeneratingSchematic ? (
               <>
                 <FaSpinner className="spinner" />
                 Generating...
@@ -55,10 +67,21 @@ const PromptEditor = ({ onGenerate, onGeneratePCB, isGenerating }) => {
           <button
             className="generate-btn generate-pcb-btn"
             onClick={handleGeneratePCB}
-            disabled={isGenerating || !prompt.trim()}
+            disabled={
+              isGeneratingSchematic || isGeneratingPCB || !prompt.trim()
+            }
           >
-            <FaPlay />
-            Generate PCB
+            {isGeneratingPCB ? (
+              <>
+                <FaSpinner className="spinner" />
+                Generating PCB...
+              </>
+            ) : (
+              <>
+                <FaPlay />
+                Generate PCB
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -77,7 +100,7 @@ Example:
 • Build a temperature sensor circuit with DHT22
 
 Press Cmd+Enter to generate"
-          disabled={isGenerating}
+          disabled={isGeneratingSchematic || isGeneratingPCB}
         />
       </div>
 
@@ -88,7 +111,9 @@ Press Cmd+Enter to generate"
             <div
               key={index}
               className="example-item"
-              onClick={() => !isGenerating && setPrompt(example)}
+              onClick={() =>
+                !isGeneratingSchematic && !isGeneratingPCB && setPrompt(example)
+              }
             >
               {example}
             </div>

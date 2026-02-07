@@ -2,7 +2,12 @@ import React from "react";
 import { FaExpand, FaCompress, FaDownload, FaSpinner } from "react-icons/fa";
 import "./SchematicViewer.css";
 
-const SchematicViewer = ({ svgContent, currentFile, isGenerating }) => {
+const SchematicViewer = ({
+  svgContent,
+  currentFile,
+  isGenerating,
+  onReset,
+}) => {
   const [zoom, setZoom] = React.useState(1);
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
@@ -16,6 +21,11 @@ const SchematicViewer = ({ svgContent, currentFile, isGenerating }) => {
 
   const handleZoomReset = () => {
     setZoom(1);
+  };
+
+  const handleReset = () => {
+    setZoom(1);
+    if (onReset) onReset();
   };
 
   const toggleFullscreen = () => {
@@ -65,9 +75,8 @@ const SchematicViewer = ({ svgContent, currentFile, isGenerating }) => {
           </button>
           <button
             className="control-btn"
-            onClick={handleZoomReset}
-            title="Reset Zoom"
-            disabled={!svgContent}
+            onClick={handleReset}
+            title="Reset All"
           >
             Reset
           </button>

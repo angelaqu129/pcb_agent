@@ -9,9 +9,11 @@ function App() {
   const [projectPath, setProjectPath] = useState(null);
   const [currentFile, setCurrentFile] = useState(null);
   const [schematicSVG, setSchematicSVG] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingSchematic, setIsGeneratingSchematic] = useState(false);
+  const [isGeneratingPCB, setIsGeneratingPCB] = useState(false);
   const [activePanel, setActivePanel] = useState("prompt");
   const [generatedComponents, setGeneratedComponents] = useState([]);
+  const [prompt, setPrompt] = useState("");
 
   const handleSelectProject = async () => {
     if (window.electronAPI) {
@@ -28,6 +30,7 @@ function App() {
       return;
     }
 
+    setIsGeneratingPCB(true);
     try {
       const response = await fetch("http://localhost:5001/api/generate-pcb", {
         method: "POST",
@@ -50,6 +53,8 @@ function App() {
     } catch (error) {
       console.error("Error generating PCB:", error);
       alert("Error generating PCB: " + error.message);
+    } finally {
+      setIsGeneratingPCB(false);
     }
   };
 
@@ -59,7 +64,7 @@ function App() {
       return;
     }
 
-    setIsGenerating(true);
+    setIsGeneratingSchematic(true);
     try {
       // Call Flask backend generate endpoint
       console.log("Calling generate with:", { prompt, directory: projectPath });
@@ -121,7 +126,7 @@ function App() {
       console.error("Error generating schematic:", error);
       alert("Error generating schematic: " + error.message);
     } finally {
-      setIsGenerating(false);
+      setIsGeneratingSchematic(false);
     }
   };
 
@@ -137,6 +142,13 @@ function App() {
         console.error("Error exporting schematic:", error);
       }
     }
+  };
+
+  const handleReset = () => {
+    setSchematicSVG(null);
+    setPrompt("");
+    setGeneratedComponents([]);
+    setCurrentFile(null);
   };
 
   return (
@@ -169,7 +181,10 @@ function App() {
             <PromptEditor
               onGenerate={handleGenerateSchematic}
               onGeneratePCB={handleGeneratePCB}
-              isGenerating={isGenerating}
+              isGeneratingSchematic={isGeneratingSchematic}
+              isGeneratingPCB={isGeneratingPCB}
+              prompt={prompt}
+              setPrompt={setPrompt}
             />
           ) : (
             <ComponentLibrary
@@ -183,7 +198,8 @@ function App() {
           <SchematicViewer
             svgContent={schematicSVG}
             currentFile={currentFile}
-            isGenerating={isGenerating}
+            isGenerating={isGeneratingSchematic}
+            onReset={handleReset}
           />
         </div>
       </div>

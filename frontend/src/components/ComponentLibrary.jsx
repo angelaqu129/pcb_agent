@@ -5,58 +5,47 @@ import "./ComponentLibrary.css";
 const ComponentLibrary = ({ projectPath, components = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredComponents, setFilteredComponents] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [allowList, setAllowList] = useState([]);
 
-  const categories = [
-    { id: "all", name: "All Components" },
-    { id: "microcontroller", name: "Microcontrollers" },
-    { id: "passive", name: "Passive Components" },
-    { id: "active", name: "Active Components" },
-    { id: "connector", name: "Connectors" },
-    { id: "power", name: "Power" },
-    { id: "sensor", name: "Sensors" },
-  ];
-
-  // Mock component data - will be replaced with actual library parsing
-  const mockComponents = [
-    { name: "Arduino_Uno", category: "microcontroller", library: "MCU_Module" },
-    {
-      name: "ATmega328P",
-      category: "microcontroller",
-      library: "MCU_Microchip_ATmega",
-    },
-    { name: "R", category: "passive", library: "Device" },
-    { name: "C", category: "passive", library: "Device" },
-    { name: "LED", category: "active", library: "Device" },
-    { name: "LM7805", category: "power", library: "Regulator_Linear" },
-    { name: "DHT22", category: "sensor", library: "Sensor_Temperature" },
-    {
-      name: "USB_C_Receptacle",
-      category: "connector",
-      library: "Connector_USB",
-    },
-  ];
+  // Load allow_list.json on mount
+  useEffect(() => {
+    fetch("http://localhost:5001/api/allow-list")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          // Map to component format
+          const mapped = data.data.map((c) => ({
+            name: c.symbol,
+            symbol: c.symbol,
+            library: c.lib?.replace(".kicad_sym", "") || "",
+            lib: c.lib,
+            footprint: c.footprint,
+          }));
+          setAllowList(mapped);
+        }
+      })
+      .catch((err) => console.error("Error loading allow list:", err));
+  }, []);
 
   useEffect(() => {
-    // Use generated components if available, otherwise show mock
-    const displayComponents =
-      components.length > 0 ? components : mockComponents;
+    // Use generated components if available, otherwise show allow list
+    const displayComponents = components.length > 0 ? components : allowList;
     let filtered = displayComponents;
-
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((c) => c.category === selectedCategory);
-    }
 
     if (searchTerm) {
       filtered = filtered.filter(
         (c) =>
-          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          c.library.toLowerCase().includes(searchTerm.toLowerCase()),
+          (c.name || c.symbol || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          (c.library || c.lib || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()),
       );
     }
 
     setFilteredComponents(filtered);
-  }, [searchTerm, selectedCategory, components, projectPath]);
+  }, [searchTerm, components, projectPath, allowList]);
 
   const handleDragStart = (e, component) => {
     e.dataTransfer.setData("component", JSON.stringify(component));
@@ -84,18 +73,6 @@ const ComponentLibrary = ({ projectPath, components = [] }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-      </div>
-
-      <div className="category-filter">
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            className={`category-btn ${selectedCategory === cat.id ? "active" : ""}`}
-            onClick={() => setSelectedCategory(cat.id)}
-          >
-            {cat.name}
-          </button>
-        ))}
       </div>
 
       <div className="component-list">

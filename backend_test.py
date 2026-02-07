@@ -22,6 +22,18 @@ def hello_world():
         'timestamp': '2024-02-06'
     })
 
+@app.route('/api/allow-list', methods=['GET'])
+def get_allow_list():
+    """Return allow_list.json data."""
+    import json
+    try:
+        with open('allow_list.json', 'r') as f:
+            data = json.load(f)
+        allowlist = data.get('allowlist', [])
+        return jsonify({'success': True, 'data': allowlist, 'count': len(allowlist)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/generate', methods=['POST'])
 def generate():
     """Generate schematic using PCB Agent - Full Workflow."""
@@ -147,8 +159,9 @@ if __name__ == '__main__':
     print("=" * 50)
     print("Available endpoints:")
     print(f"  GET  http://localhost:{port}/api/hello")
+    print(f"  GET  http://localhost:{port}/api/allow-list")
     print(f"  POST http://localhost:{port}/api/generate")
-    print(f"  POST http://localhost:{port}api/render-schematic")
+    print(f"  POST http://localhost:{port}/api/render-schematic")
     print(f"  POST http://localhost:{port}/api/generate-pcb")
     print("=" * 50)
     app.run(debug=True, port=port)
