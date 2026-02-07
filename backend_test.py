@@ -34,6 +34,54 @@ def get_allow_list():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/chat-components', methods=['POST'])
+def chat_components():
+    """Filter components using Phase 0 only (_stage0_filter_components)."""
+    import asyncio
+    import sys
+    import os
+    
+    sys.path.insert(0, os.path.dirname(__file__))
+    
+    data = request.get_json()
+    prompt = data.get('prompt', '')
+    directory = data.get('directory', '')
+    
+    if not prompt:
+        return jsonify({'success': False, 'error': 'No prompt provided'}), 400
+    
+    if not directory:
+        return jsonify({'success': False, 'error': 'No directory provided'}), 400
+    
+    try:
+        from pcb_agent import PCBAgent
+        
+        async def run_filter():
+            agent = PCBAgent(verbose=True)
+            try:
+                # Only run Phase 0: filter components
+                filtered_components = await agent._stage0_filter_components(prompt)
+                return filtered_components
+            finally:
+                await agent.aclose()
+        
+        # Execute async function
+        filtered_components = asyncio.run(run_filter())
+        
+        return jsonify({
+            'success': True,
+            'components': filtered_components,
+            'message': f'I found {len(filtered_components)} components for your circuit. Would you like to add or remove any components?'
+        })
+        
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
 @app.route('/api/generate', methods=['POST'])
 def generate():
     """Generate schematic using PCB Agent - Full Workflow."""
@@ -48,6 +96,7 @@ def generate():
     data = request.get_json()
     prompt = data.get('prompt', '')
     directory = data.get('directory', '')
+    selected_components = data.get('selected_components', None)
     
     if not prompt:
         return jsonify({
@@ -68,11 +117,15 @@ def generate():
         # Run full generate_schematic workflow
         async def run_generation():
             agent = PCBAgent(verbose=True)
-            result = await agent.generate_schematic(
-                user_prompt=prompt,
-                directory_path=directory
-            )
-            return result
+            try:
+                result = await agent.generate_schematic(
+                    user_prompt=prompt,
+                    directory_path=directory,
+                    selected_components=selected_components
+                )
+                return result
+            finally:
+                await agent.aclose()
         
         # Execute async function
         result = asyncio.run(run_generation())
@@ -160,6 +213,7 @@ if __name__ == '__main__':
     print("Available endpoints:")
     print(f"  GET  http://localhost:{port}/api/hello")
     print(f"  GET  http://localhost:{port}/api/allow-list")
+    print(f"  POST http://localhost:{port}/api/chat-components")
     print(f"  POST http://localhost:{port}/api/generate")
     print(f"  POST http://localhost:{port}/api/render-schematic")
     print(f"  POST http://localhost:{port}/api/generate-pcb")

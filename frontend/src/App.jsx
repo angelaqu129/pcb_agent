@@ -11,6 +11,7 @@ function App() {
   const [schematicSVG, setSchematicSVG] = useState(null);
   const [isGeneratingSchematic, setIsGeneratingSchematic] = useState(false);
   const [isGeneratingPCB, setIsGeneratingPCB] = useState(false);
+  const [isSelectingComponents, setIsSelectingComponents] = useState(false);
   const [activePanel, setActivePanel] = useState("prompt");
   const [generatedComponents, setGeneratedComponents] = useState([]);
   const [prompt, setPrompt] = useState("");
@@ -58,6 +59,42 @@ function App() {
     }
   };
 
+  const handleSelectComponents = async (prompt) => {
+    if (!projectPath) {
+      alert("Please select a project directory first");
+      return;
+    }
+
+    setIsSelectingComponents(true);
+    try {
+      const response = await fetch(
+        "http://localhost:5001/api/chat-components",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: prompt, directory: projectPath }),
+        },
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        setGeneratedComponents(result.components);
+        setActivePanel("components"); // Switch to components tab
+        alert(
+          `Selected ${result.components.length} components. Check the Components tab to review.`,
+        );
+      } else {
+        alert("Component selection failed: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error selecting components:", error);
+      alert("Error selecting components: " + error.message);
+    } finally {
+      setIsSelectingComponents(false);
+    }
+  };
+
   const handleGenerateSchematic = async (prompt) => {
     if (!projectPath) {
       alert("Please select a project directory first");
@@ -67,17 +104,28 @@ function App() {
     setIsGeneratingSchematic(true);
     try {
       // Call Flask backend generate endpoint
-      console.log("Calling generate with:", { prompt, directory: projectPath });
+      const requestBody = {
+        prompt: prompt,
+        directory: projectPath,
+      };
+
+      // If user has selected components, pass them to skip Phase 0
+      if (generatedComponents.length > 0) {
+        requestBody.selected_components = generatedComponents;
+        console.log(
+          "Calling generate with selected components:",
+          generatedComponents.length,
+        );
+      }
+
+      console.log("Calling generate with:", requestBody);
 
       const response = await fetch("http://localhost:5001/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          prompt: prompt,
-          directory: projectPath, // ← Pass directory path
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const result = await response.json();
@@ -151,6 +199,27 @@ function App() {
     setCurrentFile(null);
   };
 
+  const handleRemoveComponent = (componentToRemove) => {
+    setGeneratedComponents((prev) =>
+      prev.filter(
+        (c) =>
+          !(
+            c.symbol === componentToRemove.symbol &&
+            c.ref_des === componentToRemove.ref_des
+          ),
+      ),
+    );
+  };
+
+  const handleAddComponent = (componentToAdd) => {
+    const exists = generatedComponents.some(
+      (c) => c.symbol === componentToAdd.symbol && c.lib === componentToAdd.lib,
+    );
+    if (!exists) {
+      setGeneratedComponents((prev) => [...prev, componentToAdd]);
+    }
+  };
+
   return (
     <div className="app">
       <Sidebar
@@ -181,8 +250,10 @@ function App() {
             <PromptEditor
               onGenerate={handleGenerateSchematic}
               onGeneratePCB={handleGeneratePCB}
+              onSelectComponents={handleSelectComponents}
               isGeneratingSchematic={isGeneratingSchematic}
               isGeneratingPCB={isGeneratingPCB}
+              isSelectingComponents={isSelectingComponents}
               prompt={prompt}
               setPrompt={setPrompt}
             />
@@ -190,6 +261,8 @@ function App() {
             <ComponentLibrary
               projectPath={projectPath}
               components={generatedComponents}
+              onRemoveComponent={handleRemoveComponent}
+              onAddComponent={handleAddComponent}
             />
           )}
         </div>

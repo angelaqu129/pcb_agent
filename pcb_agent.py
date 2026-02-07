@@ -71,6 +71,13 @@ class PCBAgent:
         
         self.log("PCBAgent initialized")
     
+    async def aclose(self):
+        """Close the async Dedalus client properly."""
+        try:
+            await self.client.aclose()
+        except:
+            pass
+    
     def log(self, message: str, phase: Optional[int] = None):
         """Log message if verbose mode enabled."""
         if self.verbose:
@@ -105,12 +112,14 @@ class PCBAgent:
         self,
         user_prompt: str,
         directory_path: str,
-        model: str = "openai/gpt-5.2"
+        model: str = "openai/gpt-5.2",
+        selected_components: List[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Run complete workflow from user prompt to netlist generation.
         
         Phases executed:
+        0. Component filtering (LLM) - skipped if selected_components provided
         1. Component selection (LLM)
         2. Component placement (Python)
         3. Pin mapping (Python)
@@ -121,6 +130,7 @@ class PCBAgent:
             user_prompt: Natural language circuit description
             directory_path: Directory containing .kicad_sch file
             model: LLM model to use (default: Claude Sonnet)
+            selected_components: Pre-selected components (skips Phase 0 if provided)
         
         Returns:
             Dictionary with status, components, nets, and file paths
@@ -140,16 +150,23 @@ class PCBAgent:
             # ============================================================
             # STAGE 0: Component Filtering (Fast LLM)
             # ============================================================
-            self.log("Pre-filtering components from allowlist", phase=0)
-            filtered_allowlist = await self._stage0_filter_components(
-                user_prompt
-            )
-            self.log(
-                f"Filtered to {len(filtered_allowlist)} relevant components "
-                f"(from {self._get_total_components()} total)",
-                phase=0
-            )
-            self._write_output(filtered_allowlist, "out/phase0_output.json", "Wrote output of phase 0 to out/phase0.json")
+            if selected_components:
+                # Use provided components, skip Phase 0
+                self.log("Using pre-selected components (skipping Phase 0)", phase=0)
+                filtered_allowlist = selected_components
+                self.log(f"Using {len(filtered_allowlist)} pre-selected components", phase=0)
+            else:
+                # Run Phase 0: filter components
+                self.log("Pre-filtering components from allowlist", phase=0)
+                filtered_allowlist = await self._stage0_filter_components(
+                    user_prompt
+                )
+                self.log(
+                    f"Filtered to {len(filtered_allowlist)} relevant components "
+                    f"(from {self._get_total_components()} total)",
+                    phase=0
+                )
+                self._write_output(filtered_allowlist, "out/phase0_output.json", "Wrote output of phase 0 to out/phase0.json")
             
             # ============================================================
             # PHASE 1: Component Selection (LLM with filtered list)
@@ -287,7 +304,7 @@ Instructions:
 Output Format (JSON only):
 {{
   "selected": [
-    {{"lib": "...", "symbol": "...", "ref": "...", "footprint": "...", "reason": "why needed"}},
+    {{"lib": "...", "symbol": "...", "ref": "...", "footprint": "...", "explanation": "why needed"}},
     ...
   ]
 }}
@@ -528,11 +545,16 @@ Rules:
 async def main():
     """Example usage of PCBAgent."""
     import sys
-    # Get user prompt from command line or use default
-    if len(sys.argv) > 1:
-        user_prompt = " ".join(sys.argv[1:])
-    else:
-        user_prompt = "Create a simple ESP32-C3 circuit"
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='PCB Agent for schematic generation')
+    parser.add_argument('prompt', nargs='?', default='Create a simple ESP32-C3 circuit', help='Circuit description')
+    parser.add_argument('--schematic', help='Schematic file path or directory')
+    parser.add_argument('--output-dir', help='Output directory')
+    parser.add_argument('--components-only', action='store_true', help='Only select components, do not generate full schematic')
+    
+    args = parser.parse_args()
+    user_prompt = args.prompt
     
     print(f"🤖 Starting PCB Agent")
     print(f"📝 User prompt: {user_prompt}")
@@ -541,23 +563,35 @@ async def main():
     # Initialize agent with verbose logging
     agent = PCBAgent(verbose=True)
     
-    # Run workflow
-    result = await agent.generate_schematic(user_prompt)
-    
-    print(f"=" * 60)
-    
-    if result["status"] == "success":
-        print(f"✅ SUCCESS!")
-        print(f"   Phases completed: {result['phases_completed']}")
-        print(f"   Components: {len(result['components'])}")
-        print(f"   Nets: {len(result['nets'])}")
-        print(f"\n📁 Files generated:")
-        for name, path in result["files"].items():
-            print(f"   - {name}: {path}")
-        print(f"\n💡 {result['message']}")
-    else:
-        print(f"❌ FAILED: {result['error']}")
-        print(f"   {result['message']}")
+    try:
+        # Determine directory path
+        directory = args.output_dir if args.output_dir else args.schematic if args.schematic else "."
+        
+        # Run workflow
+        if args.components_only:
+            result = await agent.select_components_only(user_prompt, directory)
+        else:
+            result = await agent.generate_schematic(user_prompt, directory)
+        
+        print(f"=" * 60)
+        
+        if result["status"] == "success":
+            print(f"✅ SUCCESS!")
+            if "phases_completed" in result:
+                print(f"   Phases completed: {result['phases_completed']}")
+            if "components" in result:
+                print(f"   Components: {len(result['components'])}")
+            if "nets" in result:
+                print(f"   Nets: {len(result['nets'])}")
+            if "files" in result:
+                print(f"\n📁 Files generated:")
+                for name, path in result["files"].items():
+                    print(f"   - {name}: {path}")
+            print(f"\n💡 {result['message']}")
+        else:
+            print(f"❌ FAILED: {result['error']}")
+    finally:
+        await agent.aclose()
 
 
 if __name__ == "__main__":

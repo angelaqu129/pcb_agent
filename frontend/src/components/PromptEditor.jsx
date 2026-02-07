@@ -5,8 +5,10 @@ import "./PromptEditor.css";
 const PromptEditor = ({
   onGenerate,
   onGeneratePCB,
+  onSelectComponents,
   isGeneratingSchematic,
   isGeneratingPCB,
+  isSelectingComponents,
   prompt,
   setPrompt,
 }) => {
@@ -24,6 +26,12 @@ const PromptEditor = ({
       onGeneratePCB
     ) {
       onGeneratePCB(prompt);
+    }
+  };
+
+  const handleSelectComponents = () => {
+    if (prompt.trim() && !isSelectingComponents && onSelectComponents) {
+      onSelectComponents(prompt);
     }
   };
 
@@ -45,6 +53,23 @@ const PromptEditor = ({
       <div className="prompt-header">
         <h3>Describe Your PCB</h3>
         <div className="button-group">
+          <button
+            className="generate-btn select-components-btn"
+            onClick={handleSelectComponents}
+            disabled={isSelectingComponents || !prompt.trim()}
+          >
+            {isSelectingComponents ? (
+              <>
+                <FaSpinner className="spinner" />
+                Selecting...
+              </>
+            ) : (
+              <>
+                <FaPlay />
+                Select Components
+              </>
+            )}
+          </button>
           <button
             className="generate-btn"
             onClick={handleGenerate}

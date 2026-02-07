@@ -48,6 +48,14 @@
   cursor: not-allowed;
 }
 
+.select-components-btn {
+  background-color: #5e3da8;
+}
+
+.select-components-btn:hover:not(:disabled) {
+  background-color: #7851c9;
+}
+
 .generate-pcb-btn {
   background-color: #0a7d47;
 }
