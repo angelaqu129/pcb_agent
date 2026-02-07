@@ -11,6 +11,8 @@ import os
 app = Flask(__name__)
 CORS(app)  # Enable CORS for Electron app
 
+KICAD_PYTHON = "/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3"
+
 @app.route('/api/hello', methods=['GET'])
 def hello_world():
     """Simple endpoint that returns hello world."""

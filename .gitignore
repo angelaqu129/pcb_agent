@@ -47,3 +47,6 @@ Thumbs.db
 # llm_output*.json
 out/
 prompt2.txt
+
+# Freerouting
+freerouting-2.1.0.jar

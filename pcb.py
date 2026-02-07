@@ -155,17 +155,21 @@ def autoroute_with_freerouting(board: pcbnew.BOARD, project_dir: Path, timeout_s
 
     print("Routing imported successfully")
 
-KICAD_PYTHON = "/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3"
-project_path = Path("/Users/angelaqu/Desktop/test/")
-sch_path = project_path / "test.kicad_sch"
-pcb_path = project_path / "test.kicad_pcb"
-board = pcbnew.LoadBoard(str(pcb_path))
 
-relayout_footprints_min_spacing(board, min_spacing_mm=2.0)
+def main(project_path_str: str):
+    """Main function to process PCB layout."""
+    project_path = Path(project_path_str)
+    pcb_path = project_path / "test.kicad_pcb"
+    board = pcbnew.LoadBoard(str(pcb_path))
 
-bounds = get_footprint_bounds(board)
-print(bounds)
-bounds = expand_bounds(bounds, margin_mm=3.0)
-draw_edge_cuts_from_bounds(board, bounds)
-autoroute_with_freerouting(board=board, project_dir=project_path)
-pcbnew.SaveBoard(str(pcb_path), board)
+    relayout_footprints_min_spacing(board, min_spacing_mm=2.0)
+
+    bounds = get_footprint_bounds(board)
+    print(bounds)
+    bounds = expand_bounds(bounds, margin_mm=3.0)
+    draw_edge_cuts_from_bounds(board, bounds)
+    autoroute_with_freerouting(board=board, project_dir=project_path)
+    pcbnew.SaveBoard(str(pcb_path), board)
+
+if __name__ == "__main__":
+    main()
