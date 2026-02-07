@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 import uuid
 import math
-from typing import Tuple
+from typing import Tuple, Any
 import json
 
 # grab sch thumbnail: kicad-cli sch export svg --output schematic.svg test.kicad_sch
@@ -249,7 +249,8 @@ def place_from_llm_output(sch_path: str | Path, lib_file: str | Path, llm_output
         at = s["at"]
         x, y, rot = at["x"], at["y"], at["rot"]
         value = s["value"]
-        sch_text = place_symbol(sch_path, lib_file / file_name, symbol_name, ref_des, x, y, rot=rot, value=value)
+        footprint = s["footprint"]
+        sch_text = place_symbol(sch_path, lib_file / file_name, symbol_name, ref_des, x, y, rot=rot, value=value, footprint=footprint)
     return sch_text
 
 def add_pin_outs(lib_dir: str | Path, llm_output: dict[str, Any]) -> dict[str, str]:

@@ -2,8 +2,9 @@ from pathlib import Path
 from schematic import llm_generate_plan, place_from_llm_output, add_pin_outs, draw_wire, draw_nets, llm_generate_nets
 import json
 from copy import deepcopy
+from typing import Tuple, Any
 
-sch = Path("/Users/adityarao/Documents/KiCad/9.0/projects/test/test.kicad_sch")
+sch = Path("/Users/angelaqu/Desktop/test/test.kicad_sch")
 symbol_lib = Path("/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/")
 
 def simplify_pins_for_llm(llm_output: dict[str, Any]) -> dict[str, Any]:

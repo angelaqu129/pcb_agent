@@ -1,0 +1,194 @@
+╔══════════════════════════════════════════════════════════════╗
+║              PCB AGENT - QUICK REFERENCE                     ║
+╚══════════════════════════════════════════════════════════════╝
+
+🚀 SETUP (One Time)
+═══════════════════════════════════════════════════════════════
+1. Install:     pip install -r requirements-agent.txt
+2. Get API key: https://dedaluslabs.ai/dashboard
+3. Configure:   cp .env.example .env
+4. Edit .env:   Add your DEDALUS_API_KEY
+5. Test:        python test_agent.py
+
+💻 USAGE
+═══════════════════════════════════════════════════════════════
+
+Command Line:
+  python pcb_agent.py "Your circuit description"
+
+Python Code:
+  from pcb_agent import PCBAgent
+  agent = PCBAgent(verbose=True)
+  result = await agent.generate_schematic("Your prompt")
+
+With Custom Log File:
+  agent = PCBAgent(verbose=True, log_file="my_run.log")
+
+Quick Test:
+  python test_agent.py
+
+📁 FILES
+═══════════════════════════════════════════════════════════════
+
+Main Files:
+  pcb_agent.py              - Main agent code
+  test_agent.py             - Test script
+  AGENT_SETUP.md            - Complete setup guide
+  AGENT_README.md           - Usage documentation
+  requirements-agent.txt    - Dependencies
+
+Configuration:
+  .env                      - API key (create this!)
+  .env.example              - Template
+  allow_list.json           - Component whitelist
+  prompt1.txt               - Phase 1 instructions
+  prompt2_instructions.txt  - Phase 5 instructions
+
+Logs:
+  pcb_agent.log             - Agent logs (auto-generated)
+
+Generated:
+  llm_output1.json          - Phase 1 output
+  llm_output1_with_pins.json - Phase 3 output
+  prompt2.txt               - Phase 4 output
+  llm_output2.json          - Phase 5 output (FINAL)
+  test.kicad_sch            - KiCAD schematic
+
+📊 WORKFLOW
+═══════════════════════════════════════════════════════════════
+
+Phase 1: Component Selection (LLM)
+  → llm_output1.json
+
+Phase 2: Placement (Python)
+  → test.kicad_sch (partial)
+
+Phase 3: Pin Mapping (Python)
+  → llm_output1_with_pins.json
+
+Phase 4: Prompt Generation (Python)
+  → prompt2.txt
+
+Phase 5: Netlist Generation (LLM)
+  → llm_output2.json
+
+Phase 6: Wire Drawing (Python)
+  → test.kicad_sch (COMPLETE with wires!) ✨
+
+✅ ALL PHASES AUTOMATED!
+
+🎯 AGENT OUTPUT
+═══════════════════════════════════════════════════════════════
+
+result = {
+  "status": "success",
+  "phases_completed": 6,
+  "components": [...],
+  "nets": [...],
+  "files": {...},
+  "message": "Complete schematic with wires!"
+}
+
+🔧 COMMON COMMANDS
+═══════════════════════════════════════════════════════════════
+
+# Run agent with verbose logging
+python pcb_agent.py "Create ESP32 circuit"
+
+# Test setup
+python test_agent.py
+
+# Check if .env is configured
+cat .env
+
+# Open generated schematic in KiCAD
+open test.kicad_sch
+
+# Export schematic to SVG
+kicad-cli sch export svg --output sch.svg test.kicad_sch
+
+# View logs
+cat pcb_agent.log
+
+🐛 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+Error: "DEDALUS_API_KEY not found"
+→ Create .env file with: DEDALUS_API_KEY=your-key
+
+Error: "Component not in allowlist"
+→ Check allow_list.json or modify prompt
+
+Error: "KiCAD library not found"
+→ Update symbol_lib_path in PCBAgent()
+
+Error: "LLM returned invalid JSON"
+→ Try different model or check prompt
+
+Enable verbose logging:
+→ Set PCB_AGENT_VERBOSE=1 in .env
+→ Or: agent = PCBAgent(verbose=True)
+
+View logs:
+→ Terminal: See output in real-time
+→ File: cat pcb_agent.log
+→ Live: tail -f pcb_agent.log
+
+Custom log file:
+→ agent = PCBAgent(verbose=True, log_file="my.log")
+
+⚙️ CONFIGURATION
+═══════════════════════════════════════════════════════════════
+
+Custom paths:
+  agent = PCBAgent(
+    allow_list_path="path/to/allow_list.json",
+    symbol_lib_path="/path/to/kicad/symbols/",
+    verbose=True
+  )
+
+Different model:
+  result = await agent.generate_schematic(
+    user_prompt="...",
+    model="openai/gpt-4o"
+  )
+
+Custom output:
+  result = await agent.generate_schematic(
+    user_prompt="...",
+    schematic_path="custom/path.kicad_sch"
+  )
+
+📚 DOCUMENTATION
+═══════════════════════════════════════════════════════════════
+
+Quick Start:     AGENT_SETUP.md
+Usage Guide:     AGENT_README.md
+Workflow Logic:  WORKFLOW_DOCUMENTATION.md
+Logging Guide:   LOGGING_GUIDE.md
+Test Results:    Run test_agent.py
+
+Dedalus Docs:    https://docs.dedaluslabs.ai/
+Get API Key:     https://dedaluslabs.ai/dashboard
+
+🔐 SECURITY
+═══════════════════════════════════════════════════════════════
+
+✅ Add .env to .gitignore (already done)
+✅ Never commit API keys
+✅ Use .env.example as template
+✅ Rotate keys periodically
+
+🎉 QUICK START CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+□ pip install -r requirements-agent.txt
+□ Get API key from dedaluslabs.ai
+□ cp .env.example .env
+□ Edit .env with your API key
+□ python test_agent.py (verify setup)
+□ python pcb_agent.py "Test circuit"
+□ Check llm_output2.json
+
+✨ YOU'RE READY TO GO!
+═══════════════════════════════════════════════════════════════

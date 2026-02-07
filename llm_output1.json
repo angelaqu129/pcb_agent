@@ -1,0 +1,145 @@
+{
+  "circuit_intent": {
+    "description": "Minimal ESP32-C3 core circuit powered from an external regulated 3.3V supply, with basic power filtering/decoupling and a UART header suitable for flashing and serial debug. Includes common boot/enable strapping resistors for stable startup.",
+    "board_type": "ESP32-C3 minimal breakout",
+    "power": {
+      "source": "External regulated 3.3V via 2-pin header",
+      "regulated_voltage": "3.3V"
+    },
+    "programming_interface": [
+      "uart"
+    ]
+  },
+  "symbols": [
+    {
+      "lib": "MCU_Espressif.kicad_sym",
+      "symbol": "ESP32-C3",
+      "ref_des": "U1",
+      "value": "ESP32-C3",
+      "at": {
+        "x": 150,
+        "y": 100,
+        "rot": 0
+      },
+      "footprint": "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.7x3.7mm",
+      "explanation": "Main MCU providing Wi-Fi/BLE and application processing; ESP32-C3 chosen as the simplest available controller in the allowlist."
+    },
+    {
+      "lib": "Connector_Generic.kicad_sym",
+      "symbol": "Conn_01x02",
+      "ref_des": "J1",
+      "value": "PWR_IN_3V3_GND",
+      "at": {
+        "x": 50,
+        "y": 40,
+        "rot": 0
+      },
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+      "explanation": "2-pin power input to supply the board from an external regulated 3.3V source plus ground, avoiding the need for an on-board regulator not present in the allowlist."
+    },
+    {
+      "lib": "Connector_Generic.kicad_sym",
+      "symbol": "Conn_01x06",
+      "ref_des": "J2",
+      "value": "UART_PROG_HDR",
+      "at": {
+        "x": 50,
+        "y": 160,
+        "rot": 0
+      },
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
+      "explanation": "6-pin header intended for UART TX/RX plus 3V3, GND, and optional EN/BOOT signals to support flashing and serial debug with a USB-UART adapter."
+    },
+    {
+      "lib": "Device.kicad_sym",
+      "symbol": "FerriteBead",
+      "ref_des": "FB1",
+      "value": "600ohm@100MHz",
+      "at": {
+        "x": 150,
+        "y": 40,
+        "rot": 0
+      },
+      "footprint": "Inductor_SMD:L_0603_1608Metric",
+      "explanation": "Ferrite bead on the 3.3V feed to the MCU domain to reduce high-frequency noise; 600ohm@100MHz is a common default for small digital boards."
+    },
+    {
+      "lib": "Device.kicad_sym",
+      "symbol": "C",
+      "ref_des": "C1",
+      "value": "10uF",
+      "at": {
+        "x": 230,
+        "y": 40,
+        "rot": 0
+      },
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "explanation": "Bulk decoupling on the 3.3V rail near the MCU to handle transient current draw; 10uF is a typical starter value for ESP-class devices."
+    },
+    {
+      "lib": "Device.kicad_sym",
+      "symbol": "C",
+      "ref_des": "C2",
+      "value": "0.1uF",
+      "at": {
+        "x": 230,
+        "y": 160,
+        "rot": 0
+      },
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "explanation": "High-frequency decoupling capacitor for the MCU supply pins; 100nF is the standard value for local bypassing."
+    },
+    {
+      "lib": "Device.kicad_sym",
+      "symbol": "R",
+      "ref_des": "R1",
+      "value": "10k",
+      "at": {
+        "x": 150,
+        "y": 160,
+        "rot": 0
+      },
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "explanation": "Pull-up resistor for the ESP32-C3 enable/reset (EN) line to ensure the chip comes out of reset reliably; 10k is a common default."
+    },
+    {
+      "lib": "Device.kicad_sym",
+      "symbol": "R",
+      "ref_des": "R2",
+      "value": "10k",
+      "at": {
+        "x": 230,
+        "y": 100,
+        "rot": 0
+      },
+      "footprint": "Resistor_SMD:R_0603_1608Metric",
+      "explanation": "Default strap/pull resistor for a boot-related GPIO to bias the device toward normal boot; 10k is commonly used for strap pulls to minimize wasted current."
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "+3V3",
+      "ref_des": "#PWR1",
+      "value": "+3V3",
+      "at": {
+        "x": 110,
+        "y": 40,
+        "rot": 0
+      },
+      "footprint": "",
+      "explanation": "3.3V power net symbol required to define the regulated rail used by the ESP32-C3 and headers; footprint left empty because power symbols do not have PCB footprints."
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "GND",
+      "ref_des": "#PWR2",
+      "value": "GND",
+      "at": {
+        "x": 110,
+        "y": 100,
+        "rot": 0
+      },
+      "footprint": "",
+      "explanation": "Ground reference symbol required for any powered circuit; footprint left empty because power symbols do not have PCB footprints."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# PCB Agent Requirements
+
+# Dedalus SDK for LLM orchestration
+dedalus-labs>=0.1.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Async support (usually included in Python 3.7+)
+# asyncio - built-in
+
+# Note: Your existing dependencies (from schematic.py) should already be installed
+# This file only adds the new dependencies for the agent system

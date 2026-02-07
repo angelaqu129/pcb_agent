@@ -1,0 +1,122 @@
+Cursor PCB - Project Structure
+===============================
+
+kicad-test/                                    # Root directory
+│
+├── 📄 README.md                               # Main documentation
+├── 📄 COMMANDS.md                             # Command reference
+├── 📄 MIGRATION.md                            # Migration guide
+├── 📄 PROJECT_STRUCTURE.txt                   # This file
+├── 📄 .gitignore                              # Git ignore rules
+│
+├── 🔧 setup.sh                                # One-time setup script
+├── 🚀 start.sh                                # Start app script
+│
+├── 📁 frontend/                               # FRONTEND (Electron + React)
+│   ├── 📄 README.md                           # Frontend docs
+│   ├── 📄 package.json                        # Frontend dependencies
+│   ├── 📄 vite.config.js                      # Vite configuration
+│   ├── 📄 index.html                          # HTML entry point
+│   ├── 📄 .gitignore                          # Frontend git ignore
+│   │
+│   ├── 📁 electron/                           # Electron main process
+│   │   ├── main.js                            # Main process, IPC handlers
+│   │   └── preload.js                         # Security bridge
+│   │
+│   ├── 📁 src/                                # React source code
+│   │   ├── App.jsx                            # Main app component
+│   │   ├── App.css                            # App styles
+│   │   ├── main.jsx                           # React entry point
+│   │   ├── index.css                          # Global styles
+│   │   │
+│   │   └── 📁 components/                     # UI Components
+│   │       ├── Sidebar.jsx                    # File explorer
+│   │       ├── Sidebar.css
+│   │       ├── PromptEditor.jsx               # Prompt input
+│   │       ├── PromptEditor.css
+│   │       ├── SchematicViewer.jsx            # SVG preview
+│   │       ├── SchematicViewer.css
+│   │       ├── ComponentLibrary.jsx           # Component browser
+│   │       └── ComponentLibrary.css
+│   │
+│   ├── 📁 node_modules/                       # Dependencies (after npm install)
+│   ├── 📁 dist/                               # Build output (after npm run build)
+│   └── 📁 out/                                # Packaged apps (after build:electron)
+│
+├── 🐍 schematic.py                            # BACKEND - KiCAD schematic generator
+├── 🐍 pcb.py                                  # PCB layout utilities
+├── 🐍 run_schematic.py                        # Schematic generation script
+├── 🐍 test_allowed_list.py                    # Tests
+│
+├── 📊 allow_list.json                         # Component whitelist
+├── 📊 llm_output1.json                        # LLM component placements
+├── 📊 llm_output1_with_pins.json              # With pin data
+├── 📊 llm_output2.json                        # LLM net connections
+├── 📊 1_symbols.json                          # Symbol definitions
+│
+├── 📝 prompt1.txt                             # Example prompts
+├── 📝 prompt2.txt
+├── 📝 prompt2_instructions.txt
+│
+└── 📁 .git/                                   # Git repository
+
+Quick Start Commands
+====================
+
+First Time:
+  $ ./setup.sh
+
+Run App:
+  $ ./start.sh
+
+Manual:
+  $ cd frontend && npm run dev
+
+Build:
+  $ cd frontend && npm run build:electron
+
+Key Files Explained
+===================
+
+Frontend Entry Points:
+  - frontend/index.html       → HTML shell
+  - frontend/src/main.jsx     → React mounts here
+  - frontend/src/App.jsx      → Main React component
+  - frontend/electron/main.js → Electron entry point
+
+Backend Entry Points:
+  - schematic.py              → KiCAD file manipulation
+  - run_schematic.py          → Orchestrates generation
+
+Configuration:
+  - frontend/package.json     → Frontend dependencies & scripts
+  - frontend/vite.config.js   → Build tool configuration
+  - .gitignore                → Root git ignore
+  - frontend/.gitignore       → Frontend git ignore
+
+Data Flow
+=========
+
+User Input (React)
+    ↓
+Electron IPC Bridge (preload.js)
+    ↓
+Electron Main (main.js)
+    ↓
+Python Backend (schematic.py)
+    ↓
+KiCAD Files (.kicad_sch)
+    ↓
+SVG Export (kicad-cli)
+    ↓
+Display in React (SchematicViewer.jsx)
+
+Development Workflow
+====================
+
+1. Setup (once):       ./setup.sh
+2. Start app:          ./start.sh
+3. Edit React code  →  Auto-reloads
+4. Edit Electron    →  Restart app
+5. Test Python:        python3 schematic.py
+6. Build for prod:     cd frontend && npm run build:electron

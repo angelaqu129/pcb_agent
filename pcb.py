@@ -1,3 +1,4 @@
+"This is for PCB layout work"
 import pcbnew
 import wx
 app = wx.App(False)
