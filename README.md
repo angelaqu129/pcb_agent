@@ -1,4 +1,4 @@
-# Cursor PCB
+# AI Agent for PCB
 
 An AI-powered PCB design assistant inspired by Cursor IDE. Describe your circuit in natural language and watch it generate KiCAD schematics automatically.
 
@@ -160,14 +160,3 @@ connected to Arduino pins
 - Python 3.8+
 - KiCAD 7.0+
 
-## 🤝 Contributing
-
-Contributions welcome! This is an experimental project exploring AI-assisted hardware design.
-
-## 📄 License
-
-MIT
-
----
-
-**Built with ❤️ for the hardware hacker community**
