@@ -97,9 +97,24 @@
       "footprint": "Package_TO_SOT_SMD:SOT-23"
     },
 
-    { "lib": "power.kicad_sym", "symbol": "+5V", "ref": "#PWR" },
-    { "lib": "power.kicad_sym", "symbol": "+3V3", "ref": "#PWR" },
-    { "lib": "power.kicad_sym", "symbol": "GND", "ref": "#PWR" },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "+5V",
+      "ref": "#PWR",
+      "footprint": ""
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "+3V3",
+      "ref": "#PWR",
+      "footprint": ""
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "GND",
+      "ref": "#PWR",
+      "footprint": ""
+    },
     {
       "lib": "power.kicad_sym",
       "symbol": "+5V",
