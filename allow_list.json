@@ -185,6 +185,6 @@
       "footprint": "TestPoint:TestPoint_Pad_D1.0mm"
     }
   ],
-  "canvas": { "xmin": 0, "ymin": 0, "xmax": 300, "ymax": 200, "grid": 1 },
+  "canvas": { "xmin": 30, "ymin": 30, "xmax": 270, "ymax": 170, "grid": 1 },
   "request": ""
 }
