@@ -93,11 +93,18 @@ class PCBAgent:
                 except Exception as e:
                     # Don't crash if logging fails, just print error
                     print(f"[Warning] Failed to write to log file: {e}")
+
+    def _write_output(self, data: dict, file_path: str | Path, msg: str) -> None:
+        path = Path(file_path)
+        with path.open("w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+
+        self.log(msg)
     
     async def generate_schematic(
         self,
         user_prompt: str,
-        schematic_path: str = "/Users/angelaqu/Desktop/test/test.kicad_sch",
+        schematic_path: str = "/Users/adityarao/Documents/KiCad/9.0/projects/test/test.kicad_sch",
         model: str = "openai/gpt-5.2"
     ) -> Dict[str, Any]:
         """
@@ -133,6 +140,7 @@ class PCBAgent:
                 f"(from {self._get_total_components()} total)",
                 phase=0
             )
+            self._write_output(filtered_allowlist, "out/phase0_output.json", "Wrote output of phase 0 to out/phase0.json")
             
             # ============================================================
             # PHASE 1: Component Selection (LLM with filtered list)
@@ -143,7 +151,7 @@ class PCBAgent:
             )
             
             # Save llm_output1.json
-            output1_path = Path("llm_output1.json")
+            output1_path = Path("out/llm_output1.json")
             with output1_path.open("w", encoding="utf-8") as f:
                 json.dump(llm_output1, f, indent=2)
             self.log(f"Saved {output1_path}", phase=1)
@@ -162,7 +170,7 @@ class PCBAgent:
             llm_output1_with_pins = add_pin_outs(self.symbol_lib, llm_output1)
             
             # Save llm_output1_with_pins.json
-            output1_pins_path = Path("llm_output1_with_pins.json")
+            output1_pins_path = Path("out/llm_output1_with_pins.json")
             with output1_pins_path.open("w", encoding="utf-8") as f:
                 json.dump(llm_output1_with_pins, f, indent=2)
             self.log(f"Saved {output1_pins_path}", phase=3)
@@ -183,7 +191,7 @@ class PCBAgent:
             )
             
             # Save llm_output2.json
-            output2_path = Path("llm_output2.json")
+            output2_path = Path("out/llm_output2.json")
             with output2_path.open("w", encoding="utf-8") as f:
                 json.dump(llm_output2, f, indent=2)
             self.log(f"Saved {output2_path}", phase=5)
@@ -333,6 +341,9 @@ Rules:
         # Load prompt1 instructions
         with self.prompt1_path.open("r", encoding="utf-8") as f:
             prompt1_template = f.read()
+
+        allowed_keys = { (item["lib"], item["symbol"]) for item in filtered_allowlist }
+        filtered_allowlist = [ item for item in allow_list_data["allowlist"] if (item.get("lib"), item.get("symbol")) in allowed_keys ]
         
         # Build complete prompt with filtered allowlist
         input_data = {
@@ -346,6 +357,8 @@ Rules:
             + "\n\nINPUT:\n"
             + json.dumps(input_data, indent=2)
         )
+
+        self._write_output(full_prompt, "out/phase1_input.json", "Wrote phase 1 input to out/phase1_input.json")
         
         self.log(f"Calling LLM for component selection (model: {model})", phase=1)
         

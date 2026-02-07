@@ -46,3 +46,4 @@ Thumbs.db
 # LLM outputs (optional - comment out if you want to track these)
 # llm_output*.json
 out/
+prompt2.txt
