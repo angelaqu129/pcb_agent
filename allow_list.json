@@ -1,91 +1,43 @@
 {
-  "allowlist": [
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "R",
-      "ref": "R",
-      "footprint": "Resistor_SMD:R_0603_1608Metric"
-    },
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "C",
-      "ref": "C",
-      "footprint": "Capacitor_SMD:C_0603_1608Metric"
-    },
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "L",
-      "ref": "L",
-      "footprint": "Inductor_SMD:L_0603_1608Metric"
-    },
+    "allowlist":
+    [
+        { "lib": "Device.kicad_sym", "symbol": "R", "ref": "R", "footprint": "Resistor_SMD:R_0603_1608Metric" },
+        { "lib": "Device.kicad_sym", "symbol": "C", "ref": "C", "footprint": "Capacitor_SMD:C_0603_1608Metric" },
+        { "lib": "Device.kicad_sym", "symbol": "L", "ref": "L", "footprint": "Inductor_SMD:L_0603_1608Metric" },
+        { "lib": "Device.kicad_sym", "symbol": "LED", "ref": "D", "footprint": "LED_SMD:LED_0603_1608Metric" },
+        { "lib": "Device.kicad_sym", "symbol": "D_Schottky", "ref": "D", "footprint": "Diode_SMD:D_SOD-123" },
 
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "R_Potentiometer",
-      "ref": "RV",
-      "footprint": "Potentiometer_SMD:Potentiometer_Bourns_TC33X_Vertical"
-    },
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "FerriteBead",
-      "ref": "FB",
-      "footprint": "Inductor_SMD:L_0603_1608Metric"
-    },
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "Crystal",
-      "ref": "Y",
-      "footprint": "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm"
-    },
-    {
-      "lib": "Device.kicad_sym",
-      "symbol": "Resonator",
-      "ref": "Y",
-      "footprint": "Crystal:Resonator-2Pin_W10.0mm_H5.0mm"
-    },
+        { "lib": "Device.kicad_sym", "symbol": "R_Potentiometer", "ref": "RV", "footprint": "Potentiometer_SMD:Potentiometer_Bourns_TC33X_Vertical" },
+        { "lib": "Device.kicad_sym", "symbol": "FerriteBead", "ref": "FB", "footprint": "Inductor_SMD:L_0603_1608Metric" },
+        { "lib": "Device.kicad_sym", "symbol": "Crystal", "ref": "Y", "footprint": "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm" },
+        { "lib": "Device.kicad_sym", "symbol": "Resonator", "ref": "Y", "footprint": "Crystal:Resonator-2Pin_W10.0mm_H5.0mm" },
 
-    {
-      "lib": "MCU_Espressif.kicad_sym",
-      "symbol": "ESP32-C3",
-      "ref": "U",
-      "footprint": "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.7x3.7mm"
-    },
+        { "lib": "MCU_Espressif.kicad_sym", "symbol": "ESP32-C3", "ref": "U", "footprint": "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.7x3.7mm" },
 
-    { "lib": "power.kicad_sym", "symbol": "+5V", "ref": "#PWR" },
-    { "lib": "power.kicad_sym", "symbol": "+3V3", "ref": "#PWR" },
-    { "lib": "power.kicad_sym", "symbol": "GND", "ref": "#PWR" },
+        { "lib": "Regulator_Linear.kicad_sym", "symbol": "ADP3336ARMZ", "ref": "U", "footprint": "Package_SO:MSOP-8_3x3mm_P0.65mm" },
 
-    {
-      "lib": "Connector_Generic.kicad_sym",
-      "symbol": "Conn_01x02",
-      "ref": "J",
-      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-    },
-    {
-      "lib": "Connector_Generic.kicad_sym",
-      "symbol": "Conn_01x03",
-      "ref": "J",
-      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
-    },
-    {
-      "lib": "Connector_Generic.kicad_sym",
-      "symbol": "Conn_01x04",
-      "ref": "J",
-      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
-    },
-    {
-      "lib": "Connector_Generic.kicad_sym",
-      "symbol": "Conn_01x05",
-      "ref": "J",
-      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
-    },
-    {
-      "lib": "Connector_Generic.kicad_sym",
-      "symbol": "Conn_01x06",
-      "ref": "J",
-      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
-    }
-  ],
+        { "lib": "Memory_Flash.kicad_sym", "symbol": "W25Q32JVSS", "ref": "U", "footprint": "Package_SO:SOIC-8_5.3x5.3mm_P1.27mm" },
+
+        { "lib": "Mechanical.kicad_sym", "symbol": "MountingHole", "ref": "H", "footprint": "MountingHole:MountingHole_3.2mm_M3" },
+
+        { "lib": "Simulation_SPICE.kicad_sym", "symbol": "NMOS", "ref": "Q", "footprint": "Package_TO_SOT_SMD:SOT-23" },
+        { "lib": "Simulation_SPICE.kicad_sym", "symbol": "PMOS", "ref": "Q", "footprint": "Package_TO_SOT_SMD:SOT-23" },
+
+        { "lib": "power.kicad_sym", "symbol": "+5V", "ref": "#PWR" },
+        { "lib": "power.kicad_sym", "symbol": "+3V3", "ref": "#PWR" },
+        { "lib": "power.kicad_sym", "symbol": "GND", "ref": "#PWR" },
+
+        { "lib": "Connector.kicad_sym", "symbol": "USB_C_Receptacle_USB2.0_14P", "ref": "J", "footprint": "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x02", "ref": "J", "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x03", "ref": "J", "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x04", "ref": "J", "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x05", "ref": "J", "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" },
+        { "lib": "Connector_Generic.kicad_sym", "symbol": "Conn_01x06", "ref": "J", "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" },
+
+        { "lib": "Switch.kicad_sym", "symbol": "SW_Push", "ref": "SW", "footprint": "Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK" },
+
+        { "lib": "Connector.kicad_sym", "symbol": "TestPoint", "ref": "TP", "footprint": "TestPoint:TestPoint_Pad_D1.0mm" }
+    ],
   "canvas": { "xmin": 0, "ymin": 0, "xmax": 300, "ymax": 200, "grid": 1 },
   "request": ""
 }
