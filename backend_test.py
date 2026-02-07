@@ -138,13 +138,14 @@ def generate_pcb():
         return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
 
 if __name__ == '__main__':
+    port = 5001
     print("=" * 50)
     print("Flask Test Server Starting...")
     print("=" * 50)
     print("Available endpoints:")
-    print("  GET  http://localhost:5000/api/hello")
-    print("  POST http://localhost:5000/api/generate")
-    print("  POST http://localhost:5000/api/render-schematic")
-    print("  POST http://localhost:5000/api/generate-pcb")
+    print(f"  GET  http://localhost:{port}/api/hello")
+    print(f"  POST http://localhost:{port}/api/generate")
+    print(f"  POST http://localhost:{port}api/render-schematic")
+    print(f"  POST http://localhost:{port}/api/generate-pcb")
     print("=" * 50)
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=port)
