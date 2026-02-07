@@ -22,6 +22,37 @@ function App() {
     }
   };
 
+  const handleGeneratePCB = async () => {
+    if (!projectPath) {
+      alert("Please select a project directory first");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5001/api/generate-pcb", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ directory: projectPath }),
+      });
+
+      const result = await response.json();
+      console.log("Generate PCB result:", result);
+
+      if (result.success) {
+        alert(result.message);
+      } else {
+        alert(
+          result.warning
+            ? result.message
+            : "PCB generation failed: " + result.error,
+        );
+      }
+    } catch (error) {
+      console.error("Error generating PCB:", error);
+      alert("Error generating PCB: " + error.message);
+    }
+  };
+
   const handleGenerateSchematic = async (prompt) => {
     if (!projectPath) {
       alert("Please select a project directory first");
@@ -137,6 +168,7 @@ function App() {
           {activePanel === "prompt" ? (
             <PromptEditor
               onGenerate={handleGenerateSchematic}
+              onGeneratePCB={handleGeneratePCB}
               isGenerating={isGenerating}
             />
           ) : (
