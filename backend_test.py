@@ -109,6 +109,34 @@ def render_schematic():
         import traceback
         return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
 
+@app.route('/api/generate-pcb', methods=['POST'])
+def generate_pcb():
+    """Generate PCB layout using pcb.py with KiCad Python."""
+    
+    data = request.get_json()
+    directory = data.get('directory', '')
+    print("directory:", directory)
+    
+    if not directory:
+        return jsonify({'success': False, 'error': 'No directory provided'}), 400
+    
+    try:
+        pcb_script = os.path.join(os.path.dirname(__file__), 'pcb.py')
+        
+        result = subprocess.run(
+            [KICAD_PYTHON, pcb_script, directory],
+            capture_output=False, text=True, timeout=300
+        )
+        
+        if result.returncode != 0:
+            return jsonify({'success': False, 'error': f'PCB generation failed: {result.stderr}'}), 500
+        
+        return jsonify({'success': True, 'message': 'PCB generated successfully', 'output': result.stdout})
+        
+    except Exception as e:
+        import traceback
+        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+
 if __name__ == '__main__':
     print("=" * 50)
     print("Flask Test Server Starting...")
@@ -117,5 +145,6 @@ if __name__ == '__main__':
     print("  GET  http://localhost:5000/api/hello")
     print("  POST http://localhost:5000/api/generate")
     print("  POST http://localhost:5000/api/render-schematic")
+    print("  POST http://localhost:5000/api/generate-pcb")
     print("=" * 50)
     app.run(debug=True, port=5001)

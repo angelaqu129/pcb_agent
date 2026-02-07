@@ -159,7 +159,15 @@ def autoroute_with_freerouting(board: pcbnew.BOARD, project_dir: Path, timeout_s
 def main(project_path_str: str):
     """Main function to process PCB layout."""
     project_path = Path(project_path_str)
-    pcb_path = project_path / "test.kicad_pcb"
+    print("project_path:", project_path)
+    # Find .kicad_pcb file in directory
+    pcb_files = list(project_path.glob("*.kicad_pcb"))
+    print(pcb_files)
+    if not pcb_files:
+        raise FileNotFoundError(f"No .kicad_pcb file found in {project_path}")
+    
+    pcb_path = pcb_files[0]
+    print(f"Found PCB file: {pcb_path}")
     board = pcbnew.LoadBoard(str(pcb_path))
 
     relayout_footprints_min_spacing(board, min_spacing_mm=2.0)
@@ -172,4 +180,6 @@ def main(project_path_str: str):
     pcbnew.SaveBoard(str(pcb_path), board)
 
 if __name__ == "__main__":
-    main()
+    import sys
+    project_path = sys.argv[1] if len(sys.argv) > 1 else None
+    main(project_path)
