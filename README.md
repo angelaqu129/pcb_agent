@@ -159,4 +159,3 @@ connected to Arduino pins
 
 - Python 3.8+
 - KiCAD 7.0+
-
