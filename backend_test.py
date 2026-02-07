@@ -20,7 +20,7 @@ def hello_world():
 
 @app.route('/api/generate', methods=['POST'])
 def generate():
-    """Generate schematic using PCB Agent Stage 0 (Component Filtering)."""
+    """Generate schematic using PCB Agent - Full Workflow."""
     from flask import request
     import asyncio
     import sys
@@ -31,6 +31,7 @@ def generate():
     
     data = request.get_json()
     prompt = data.get('prompt', '')
+    directory = data.get('directory', '')
     
     if not prompt:
         return jsonify({
@@ -38,26 +39,29 @@ def generate():
             'error': 'No prompt provided'
         }), 400
     
+    if not directory:
+        return jsonify({
+            'success': False,
+            'error': 'No directory provided'
+        }), 400
+    
     try:
         # Import PCBAgent
         from pcb_agent import PCBAgent
         
-        # Run Stage 0 asynchronously
-        async def run_stage0():
+        # Run full generate_schematic workflow
+        async def run_generation():
             agent = PCBAgent(verbose=True)
-            filtered_components = await agent._stage0_filter_components(prompt)
-            return filtered_components
+            result = await agent.generate_schematic(
+                user_prompt=prompt,
+                directory_path=directory
+            )
+            return result
         
         # Execute async function
-        filtered_components = asyncio.run(run_stage0())
+        result = asyncio.run(run_generation())
         
-        return jsonify({
-            'success': True,
-            'message': f'Filtered components for: {prompt}',
-            'prompt': prompt,
-            'components': filtered_components,
-            'count': len(filtered_components)
-        })
+        return jsonify(result)
         
     except Exception as e:
         import traceback

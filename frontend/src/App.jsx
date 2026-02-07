@@ -30,23 +30,30 @@ function App() {
     setIsGenerating(true);
     try {
       // Call Flask backend generate endpoint
+      console.log("Calling generate with:", { prompt, directory: projectPath });
+
       const response = await fetch("http://localhost:5001/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt: prompt,
+          directory: projectPath, // ← Pass directory path
+        }),
       });
 
       const result = await response.json();
       console.log("Generate result:", result);
 
-      if (result.success) {
+      if (result.success || result.status === "success") {
+        const componentCount = result.components?.length || 0;
+        const netCount = result.nets?.length || 0;
         alert(
-          `Schematic generated successfully!\nPrompt: ${result.prompt}\nComponents: ${result.components.length}`,
+          `Schematic generated successfully!\nComponents: ${componentCount}\nNets: ${netCount}`,
         );
       } else {
-        alert("Generation failed: " + result.message);
+        alert("Generation failed: " + (result.error || result.message));
       }
     } catch (error) {
       console.error("Error generating schematic:", error);
