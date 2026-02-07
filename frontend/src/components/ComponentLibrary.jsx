@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaMicrochip } from "react-icons/fa";
 import "./ComponentLibrary.css";
 
-const ComponentLibrary = ({ projectPath }) => {
+const ComponentLibrary = ({ projectPath, components = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [components, setComponents] = useState([]);
   const [filteredComponents, setFilteredComponents] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
@@ -39,13 +38,10 @@ const ComponentLibrary = ({ projectPath }) => {
   ];
 
   useEffect(() => {
-    // TODO: Load actual components from KiCAD libraries
-    setComponents(mockComponents);
-    setFilteredComponents(mockComponents);
-  }, [projectPath]);
-
-  useEffect(() => {
-    let filtered = components;
+    // Use generated components if available, otherwise show mock
+    const displayComponents =
+      components.length > 0 ? components : mockComponents;
+    let filtered = displayComponents;
 
     if (selectedCategory !== "all") {
       filtered = filtered.filter((c) => c.category === selectedCategory);
@@ -60,7 +56,7 @@ const ComponentLibrary = ({ projectPath }) => {
     }
 
     setFilteredComponents(filtered);
-  }, [searchTerm, selectedCategory, components]);
+  }, [searchTerm, selectedCategory, components, projectPath]);
 
   const handleDragStart = (e, component) => {
     e.dataTransfer.setData("component", JSON.stringify(component));
@@ -69,7 +65,14 @@ const ComponentLibrary = ({ projectPath }) => {
   return (
     <div className="component-library">
       <div className="library-header">
-        <h3>Component Library</h3>
+        <h3>
+          {components.length > 0 ? "Generated Components" : "Component Library"}
+        </h3>
+        {components.length > 0 && (
+          <span className="component-count-badge">
+            {components.length} selected
+          </span>
+        )}
       </div>
 
       <div className="search-container">
@@ -106,8 +109,23 @@ const ComponentLibrary = ({ projectPath }) => {
             >
               <FaMicrochip className="component-icon" />
               <div className="component-info">
-                <div className="component-name">{component.name}</div>
-                <div className="component-library">{component.library}</div>
+                <div className="component-name">
+                  {component.symbol || component.name}
+                  {component.ref_des && (
+                    <span className="ref-badge">{component.ref_des}</span>
+                  )}
+                </div>
+                {component.value && (
+                  <div className="component-value">{component.value}</div>
+                )}
+                <div className="component-library">
+                  {component.lib || component.library}
+                </div>
+                {component.explanation && (
+                  <div className="component-explanation">
+                    💡 {component.explanation}
+                  </div>
+                )}
               </div>
             </div>
           ))

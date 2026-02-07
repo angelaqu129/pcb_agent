@@ -10,7 +10,8 @@ function App() {
   const [currentFile, setCurrentFile] = useState(null);
   const [schematicSVG, setSchematicSVG] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activePanel, setActivePanel] = useState("prompt"); // 'prompt' or 'components'
+  const [activePanel, setActivePanel] = useState("prompt");
+  const [generatedComponents, setGeneratedComponents] = useState([]);
 
   const handleSelectProject = async () => {
     if (window.electronAPI) {
@@ -49,6 +50,36 @@ function App() {
       if (result.success || result.status === "success") {
         const componentCount = result.components?.length || 0;
         const netCount = result.nets?.length || 0;
+
+        // Store generated components
+        setGeneratedComponents(result.components || []);
+
+        // Render schematic using kicad-cli
+        const schematicPath = result.files?.schematic || result.schematic_path;
+
+        if (schematicPath) {
+          const svgResponse = await fetch(
+            "http://localhost:5001/api/render-schematic",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ schematic_path: schematicPath }),
+            },
+          );
+
+          const svgResult = await svgResponse.json();
+
+          if (svgResult.success) {
+            setSchematicSVG(svgResult.svg_content);
+            setCurrentFile(schematicPath);
+            console.log("Schematic rendered and displayed!");
+          } else {
+            console.error("SVG render failed:", svgResult.error);
+          }
+        } else {
+          console.warn("No schematic path found in result");
+        }
+
         alert(
           `Schematic generated successfully!\nComponents: ${componentCount}\nNets: ${netCount}`,
         );
@@ -109,7 +140,10 @@ function App() {
               isGenerating={isGenerating}
             />
           ) : (
-            <ComponentLibrary projectPath={projectPath} />
+            <ComponentLibrary
+              projectPath={projectPath}
+              components={generatedComponents}
+            />
           )}
         </div>
 

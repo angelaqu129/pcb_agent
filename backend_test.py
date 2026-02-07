@@ -3,8 +3,10 @@ Simple Flask backend for testing frontend connection.
 Run with: python backend_test.py
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
+import subprocess
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for Electron app
@@ -71,6 +73,40 @@ def generate():
             'traceback': traceback.format_exc()
         }), 500
 
+@app.route('/api/render-schematic', methods=['POST'])
+def render_schematic():
+    """Render schematic to SVG using kicad-cli."""
+    
+    data = request.get_json()
+    schematic_path = data.get('schematic_path', '')
+    
+    try:
+        # Generate SVG output path
+        base = schematic_path.replace('.kicad_sch', '')
+        svg_output_dir = f"{base}_schematic_svg"
+        
+        # Run kicad-cli
+        result = subprocess.run(
+            ['kicad-cli', 'sch', 'export', 'svg', '--output', svg_output_dir, schematic_path],
+            capture_output=True, text=True, timeout=30
+        )
+
+        # kicad-cli creates a directory, find .svg file inside the directory
+        svg_files = [f for f in os.listdir(svg_output_dir) if f.endswith('.svg')]
+        if svg_files:
+            svg_path = os.path.join(svg_output_dir, svg_files[0])
+        else:
+            return jsonify({'success': False, 'error': 'No SVG file found in output directory'}), 500
+        
+        with open(svg_path, 'r') as f:
+            svg_content = f.read()
+        
+        return jsonify({'success': True, 'svg_content': svg_content, 'svg_path': svg_path})
+        
+    except Exception as e:
+        import traceback
+        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+
 if __name__ == '__main__':
     print("=" * 50)
     print("Flask Test Server Starting...")
@@ -78,5 +114,6 @@ if __name__ == '__main__':
     print("Available endpoints:")
     print("  GET  http://localhost:5000/api/hello")
     print("  POST http://localhost:5000/api/generate")
+    print("  POST http://localhost:5000/api/render-schematic")
     print("=" * 50)
     app.run(debug=True, port=5001)
