@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { FaPlay, FaSpinner } from "react-icons/fa";
 import "./PromptEditor.css";
 
-const PromptEditor = ({ onGenerate, isGenerating }) => {
+const PromptEditor = ({ onGenerate, onGeneratePCB, isGenerating }) => {
   const [prompt, setPrompt] = useState("");
 
   const handleGenerate = () => {
     if (prompt.trim() && !isGenerating) {
       onGenerate(prompt);
+    }
+  };
+
+  const handleGeneratePCB = () => {
+    if (prompt.trim() && !isGenerating && onGeneratePCB) {
+      onGeneratePCB(prompt);
     }
   };
 
@@ -28,23 +34,33 @@ const PromptEditor = ({ onGenerate, isGenerating }) => {
     <div className="prompt-editor">
       <div className="prompt-header">
         <h3>Describe Your PCB</h3>
-        <button
-          className="generate-btn"
-          onClick={handleGenerate}
-          disabled={isGenerating || !prompt.trim()}
-        >
-          {isGenerating ? (
-            <>
-              <FaSpinner className="spinner" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <FaPlay />
-              Generate
-            </>
-          )}
-        </button>
+        <div className="button-group">
+          <button
+            className="generate-btn"
+            onClick={handleGenerate}
+            disabled={isGenerating || !prompt.trim()}
+          >
+            {isGenerating ? (
+              <>
+                <FaSpinner className="spinner" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <FaPlay />
+                Generate Schematic
+              </>
+            )}
+          </button>
+          <button
+            className="generate-btn generate-pcb-btn"
+            onClick={handleGeneratePCB}
+            disabled={isGenerating || !prompt.trim()}
+          >
+            <FaPlay />
+            Generate PCB
+          </button>
+        </div>
       </div>
 
       <div className="prompt-input-container">

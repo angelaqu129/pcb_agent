@@ -14,6 +14,11 @@
   background-color: #2d2d30;
 }
 
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
 .prompt-header h3 {
   font-size: 14px;
   font-weight: 600;
@@ -41,6 +46,14 @@
 .generate-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.generate-pcb-btn {
+  background-color: #0a7d47;
+}
+
+.generate-pcb-btn:hover:not(:disabled) {
+  background-color: #0c9955;
 }
 
 .spinner {
