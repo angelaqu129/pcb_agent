@@ -1,61 +1,28 @@
 {
   "nets": [
     {
-      "name": "+3V3",
+      "name": "NET_3V3_IN",
       "connections": [
+        {
+          "ref": "J1",
+          "pin": 1
+        },
+        {
+          "ref": "FB1",
+          "pin": 1
+        }
+      ]
+    },
+    {
+      "name": "NET_3V3",
+      "connections": [
+        {
+          "ref": "FB1",
+          "pin": 2
+        },
         {
           "ref": "#PWR1",
           "pin": 1
-        },
-        {
-          "ref": "J1",
-          "pin": 1
-        },
-        {
-          "ref": "FB1",
-          "pin": 1
-        },
-        {
-          "ref": "J2",
-          "pin": 2
-        }
-      ]
-    },
-    {
-      "name": "GND",
-      "connections": [
-        {
-          "ref": "#PWR2",
-          "pin": 1
-        },
-        {
-          "ref": "J1",
-          "pin": 2
-        },
-        {
-          "ref": "U1",
-          "pin": 33
-        },
-        {
-          "ref": "C1",
-          "pin": 2
-        },
-        {
-          "ref": "C2",
-          "pin": 2
-        },
-        {
-          "ref": "J2",
-          "pin": 1
-        }
-      ]
-    },
-    {
-      "name": "+3V3_MCU",
-      "connections": [
-        {
-          "ref": "FB1",
-          "pin": 2
         },
         {
           "ref": "U1",
@@ -98,13 +65,54 @@
           "pin": 1
         },
         {
-          "ref": "R2",
+          "ref": "J2",
           "pin": 1
         }
       ]
     },
     {
-      "name": "ESP_EN",
+      "name": "NET_GND",
+      "connections": [
+        {
+          "ref": "#PWR2",
+          "pin": 1
+        },
+        {
+          "ref": "J1",
+          "pin": 2
+        },
+        {
+          "ref": "U1",
+          "pin": 33
+        },
+        {
+          "ref": "C1",
+          "pin": 2
+        },
+        {
+          "ref": "C2",
+          "pin": 2
+        },
+        {
+          "ref": "C5",
+          "pin": 2
+        },
+        {
+          "ref": "C3",
+          "pin": 2
+        },
+        {
+          "ref": "C4",
+          "pin": 2
+        },
+        {
+          "ref": "J2",
+          "pin": 2
+        }
+      ]
+    },
+    {
+      "name": "NET_EN_CHIP_ENABLE",
       "connections": [
         {
           "ref": "U1",
@@ -115,34 +123,77 @@
           "pin": 2
         },
         {
-          "ref": "J2",
-          "pin": 5
+          "ref": "C5",
+          "pin": 1
         }
       ]
     },
     {
-      "name": "ESP_BOOT_IO9",
+      "name": "NET_UART0_RX_TO_MCU",
       "connections": [
         {
           "ref": "U1",
-          "pin": 15
+          "pin": 27
         },
         {
-          "ref": "R2",
-          "pin": 2
-        },
-        {
-          "ref": "J2",
-          "pin": 6
+          "ref": "J1",
+          "pin": 3
         }
       ]
     },
     {
-      "name": "UART_U0TXD",
+      "name": "NET_UART0_TX_FROM_MCU",
       "connections": [
         {
           "ref": "U1",
           "pin": 28
+        },
+        {
+          "ref": "J1",
+          "pin": 4
+        }
+      ]
+    },
+    {
+      "name": "NET_XTAL_40M_P",
+      "connections": [
+        {
+          "ref": "U1",
+          "pin": 30
+        },
+        {
+          "ref": "Y1",
+          "pin": 1
+        },
+        {
+          "ref": "C3",
+          "pin": 1
+        }
+      ]
+    },
+    {
+      "name": "NET_XTAL_40M_N",
+      "connections": [
+        {
+          "ref": "U1",
+          "pin": 29
+        },
+        {
+          "ref": "Y1",
+          "pin": 2
+        },
+        {
+          "ref": "C4",
+          "pin": 1
+        }
+      ]
+    },
+    {
+      "name": "NET_GPIO2_BREAKOUT",
+      "connections": [
+        {
+          "ref": "U1",
+          "pin": 6
         },
         {
           "ref": "J2",
@@ -151,15 +202,41 @@
       ]
     },
     {
-      "name": "UART_U0RXD",
+      "name": "NET_GPIO3_BREAKOUT",
       "connections": [
         {
           "ref": "U1",
-          "pin": 27
+          "pin": 8
         },
         {
           "ref": "J2",
           "pin": 4
+        }
+      ]
+    },
+    {
+      "name": "NET_GPIO8_BREAKOUT",
+      "connections": [
+        {
+          "ref": "U1",
+          "pin": 14
+        },
+        {
+          "ref": "J2",
+          "pin": 5
+        }
+      ]
+    },
+    {
+      "name": "NET_GPIO9_BREAKOUT",
+      "connections": [
+        {
+          "ref": "U1",
+          "pin": 15
+        },
+        {
+          "ref": "J2",
+          "pin": 6
         }
       ]
     }

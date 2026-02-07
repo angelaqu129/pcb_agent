@@ -1,9 +1,9 @@
 {
   "circuit_intent": {
-    "description": "Minimal ESP32-C3 core circuit powered from an external regulated 3.3V supply, with basic power filtering/decoupling and a UART header suitable for flashing and serial debug. Includes common boot/enable strapping resistors for stable startup.",
-    "board_type": "ESP32-C3 minimal breakout",
+    "description": "Simple ESP32-C3 minimal circuit with external 3.3V power, basic UART programming header, and a small GPIO breakout header. Includes power filtering/decoupling and an optional external 40MHz crystal network for stable clocking.",
+    "board_type": "mcu_module_minimal",
     "power": {
-      "source": "External regulated 3.3V via 2-pin header",
+      "source": "External 3.3V supply via pin header",
       "regulated_voltage": "3.3V"
     },
     "programming_interface": [
@@ -22,7 +22,7 @@
         "rot": 0
       },
       "footprint": "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.7x3.7mm",
-      "explanation": "Main MCU providing Wi-Fi/BLE and application processing; ESP32-C3 chosen as the simplest available controller in the allowlist.",
+      "explanation": "Main MCU providing compute and Wi-Fi/BLE; ESP32-C3 chosen per request for a simple ESP32-based circuit.",
       "pins": {
         "6": {
           "name": "GPIO2",
@@ -292,22 +292,22 @@
     },
     {
       "lib": "Connector_Generic.kicad_sym",
-      "symbol": "Conn_01x02",
+      "symbol": "Conn_01x04",
       "ref_des": "J1",
-      "value": "PWR_IN_3V3_GND",
+      "value": "UART_PROG(3V3,GND,TX,RX)",
       "at": {
         "x": 50,
-        "y": 40,
+        "y": 50,
         "rot": 0
       },
-      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
-      "explanation": "2-pin power input to supply the board from an external regulated 3.3V source plus ground, avoiding the need for an on-board regulator not present in the allowlist.",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+      "explanation": "Simple 4-pin header for powering the board (3V3/GND) and UART programming/serial console (TX/RX).",
       "pins": {
         "1": {
           "name": "Pin_1",
           "pos": [
             44.92,
-            40.0,
+            47.46,
             0
           ]
         },
@@ -315,7 +315,23 @@
           "name": "Pin_2",
           "pos": [
             44.92,
-            42.54,
+            50.0,
+            0
+          ]
+        },
+        "3": {
+          "name": "Pin_3",
+          "pos": [
+            44.92,
+            52.54,
+            0
+          ]
+        },
+        "4": {
+          "name": "Pin_4",
+          "pos": [
+            44.92,
+            55.08,
             0
           ]
         }
@@ -325,61 +341,107 @@
       "lib": "Connector_Generic.kicad_sym",
       "symbol": "Conn_01x06",
       "ref_des": "J2",
-      "value": "UART_PROG_HDR",
+      "value": "GPIO_BREAKOUT",
       "at": {
-        "x": 50,
-        "y": 160,
+        "x": 250,
+        "y": 50,
         "rot": 0
       },
       "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
-      "explanation": "6-pin header intended for UART TX/RX plus 3V3, GND, and optional EN/BOOT signals to support flashing and serial debug with a USB-UART adapter.",
+      "explanation": "GPIO breakout header to access multiple ESP32-C3 pins for simple prototyping and peripherals.",
       "pins": {
         "1": {
           "name": "Pin_1",
           "pos": [
+            244.92,
             44.92,
-            154.92,
             0
           ]
         },
         "2": {
           "name": "Pin_2",
           "pos": [
-            44.92,
-            157.46,
+            244.92,
+            47.46,
             0
           ]
         },
         "3": {
           "name": "Pin_3",
           "pos": [
-            44.92,
-            160.0,
+            244.92,
+            50.0,
             0
           ]
         },
         "4": {
           "name": "Pin_4",
           "pos": [
-            44.92,
-            162.54,
+            244.92,
+            52.54,
             0
           ]
         },
         "5": {
           "name": "Pin_5",
           "pos": [
-            44.92,
-            165.08,
+            244.92,
+            55.08,
             0
           ]
         },
         "6": {
           "name": "Pin_6",
           "pos": [
-            44.92,
-            167.62,
+            244.92,
+            57.62,
             0
+          ]
+        }
+      }
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "+3V3",
+      "ref_des": "#PWR1",
+      "value": "+3V3",
+      "at": {
+        "x": 20,
+        "y": 120,
+        "rot": 0
+      },
+      "footprint": "",
+      "explanation": "3.3V rail symbol required to power the ESP32-C3 and associated circuitry from the external 3.3V source.",
+      "pins": {
+        "1": {
+          "name": "~",
+          "pos": [
+            20.0,
+            120.0,
+            90
+          ]
+        }
+      }
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "GND",
+      "ref_des": "#PWR2",
+      "value": "GND",
+      "at": {
+        "x": 20,
+        "y": 160,
+        "rot": 0
+      },
+      "footprint": "",
+      "explanation": "Ground reference for the power system and signal return paths; required for any powered circuit.",
+      "pins": {
+        "1": {
+          "name": "~",
+          "pos": [
+            20.0,
+            160.0,
+            270
           ]
         }
       }
@@ -390,26 +452,26 @@
       "ref_des": "FB1",
       "value": "600ohm@100MHz",
       "at": {
-        "x": 150,
-        "y": 40,
+        "x": 70,
+        "y": 120,
         "rot": 0
       },
       "footprint": "Inductor_SMD:L_0603_1608Metric",
-      "explanation": "Ferrite bead on the 3.3V feed to the MCU domain to reduce high-frequency noise; 600ohm@100MHz is a common default for small digital boards.",
+      "explanation": "Ferrite bead on the 3.3V input to reduce high-frequency noise into the MCU supply; 600ohm@100MHz is a common default for small digital rails.",
       "pins": {
         "1": {
           "name": "~",
           "pos": [
-            150.0,
-            36.19,
+            70.0,
+            116.19,
             270
           ]
         },
         "2": {
           "name": "~",
           "pos": [
-            150.0,
-            43.81,
+            70.0,
+            123.81,
             90
           ]
         }
@@ -421,26 +483,26 @@
       "ref_des": "C1",
       "value": "10uF",
       "at": {
-        "x": 230,
-        "y": 40,
+        "x": 110,
+        "y": 100,
         "rot": 0
       },
       "footprint": "Capacitor_SMD:C_0603_1608Metric",
-      "explanation": "Bulk decoupling on the 3.3V rail near the MCU to handle transient current draw; 10uF is a typical starter value for ESP-class devices.",
+      "explanation": "Bulk decoupling for the 3.3V rail near the MCU; 10uF is a typical value to handle transient current demands.",
       "pins": {
         "1": {
           "name": "~",
           "pos": [
-            230.0,
-            36.19,
+            110.0,
+            96.19,
             270
           ]
         },
         "2": {
           "name": "~",
           "pos": [
-            230.0,
-            43.81,
+            110.0,
+            103.81,
             90
           ]
         }
@@ -452,26 +514,26 @@
       "ref_des": "C2",
       "value": "0.1uF",
       "at": {
-        "x": 230,
-        "y": 160,
+        "x": 190,
+        "y": 100,
         "rot": 0
       },
       "footprint": "Capacitor_SMD:C_0603_1608Metric",
-      "explanation": "High-frequency decoupling capacitor for the MCU supply pins; 100nF is the standard value for local bypassing.",
+      "explanation": "High-frequency decoupling capacitor for the MCU supply; 0.1uF is a standard value for digital IC bypassing.",
       "pins": {
         "1": {
           "name": "~",
           "pos": [
-            230.0,
-            156.19,
+            190.0,
+            96.19,
             270
           ]
         },
         "2": {
           "name": "~",
           "pos": [
-            230.0,
-            163.81,
+            190.0,
+            103.81,
             90
           ]
         }
@@ -484,17 +546,17 @@
       "value": "10k",
       "at": {
         "x": 150,
-        "y": 160,
+        "y": 20,
         "rot": 0
       },
       "footprint": "Resistor_SMD:R_0603_1608Metric",
-      "explanation": "Pull-up resistor for the ESP32-C3 enable/reset (EN) line to ensure the chip comes out of reset reliably; 10k is a common default.",
+      "explanation": "Default pull-up resistor for an enable/reset-related strap (commonly EN) to ensure the MCU boots reliably; 10k is a common pull value.",
       "pins": {
         "1": {
           "name": "~",
           "pos": [
             150.0,
-            156.19,
+            16.19,
             270
           ]
         },
@@ -502,7 +564,7 @@
           "name": "~",
           "pos": [
             150.0,
-            163.81,
+            23.81,
             90
           ]
         }
@@ -510,77 +572,124 @@
     },
     {
       "lib": "Device.kicad_sym",
-      "symbol": "R",
-      "ref_des": "R2",
-      "value": "10k",
+      "symbol": "C",
+      "ref_des": "C5",
+      "value": "0.1uF",
       "at": {
-        "x": 230,
-        "y": 100,
+        "x": 200,
+        "y": 20,
         "rot": 0
       },
-      "footprint": "Resistor_SMD:R_0603_1608Metric",
-      "explanation": "Default strap/pull resistor for a boot-related GPIO to bias the device toward normal boot; 10k is commonly used for strap pulls to minimize wasted current.",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "explanation": "Small capacitor used as an optional RC reset/enable filter with the pull-up to improve power-on reset behavior; 0.1uF is a typical default.",
       "pins": {
         "1": {
           "name": "~",
           "pos": [
-            230.0,
-            96.19,
+            200.0,
+            16.19,
             270
           ]
         },
         "2": {
           "name": "~",
           "pos": [
-            230.0,
-            103.81,
+            200.0,
+            23.81,
             90
           ]
         }
       }
     },
     {
-      "lib": "power.kicad_sym",
-      "symbol": "+3V3",
-      "ref_des": "#PWR1",
-      "value": "+3V3",
+      "lib": "Device.kicad_sym",
+      "symbol": "Crystal",
+      "ref_des": "Y1",
+      "value": "40MHz",
       "at": {
-        "x": 110,
-        "y": 40,
+        "x": 150,
+        "y": 150,
         "rot": 0
       },
-      "footprint": "",
-      "explanation": "3.3V power net symbol required to define the regulated rail used by the ESP32-C3 and headers; footprint left empty because power symbols do not have PCB footprints.",
+      "footprint": "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm",
+      "explanation": "Optional external crystal for more accurate/stable clocking; 40MHz is a common crystal frequency used with ESP32-class designs.",
       "pins": {
         "1": {
-          "name": "~",
+          "name": "1",
           "pos": [
-            110.0,
-            40.0,
-            90
+            146.19,
+            150.0,
+            0
+          ]
+        },
+        "2": {
+          "name": "2",
+          "pos": [
+            153.81,
+            150.0,
+            180
           ]
         }
       }
     },
     {
-      "lib": "power.kicad_sym",
-      "symbol": "GND",
-      "ref_des": "#PWR2",
-      "value": "GND",
+      "lib": "Device.kicad_sym",
+      "symbol": "C",
+      "ref_des": "C3",
+      "value": "18pF",
       "at": {
         "x": 110,
-        "y": 100,
+        "y": 150,
         "rot": 0
       },
-      "footprint": "",
-      "explanation": "Ground reference symbol required for any powered circuit; footprint left empty because power symbols do not have PCB footprints.",
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "explanation": "Crystal load capacitor (one side) to support Y1 oscillation; 18pF is a common starting value for 40MHz crystals depending on CL and layout.",
       "pins": {
         "1": {
           "name": "~",
           "pos": [
             110.0,
-            100.0,
+            146.19,
             270
+          ]
+        },
+        "2": {
+          "name": "~",
+          "pos": [
+            110.0,
+            153.81,
+            90
+          ]
+        }
+      }
+    },
+    {
+      "lib": "Device.kicad_sym",
+      "symbol": "C",
+      "ref_des": "C4",
+      "value": "18pF",
+      "at": {
+        "x": 190,
+        "y": 150,
+        "rot": 0
+      },
+      "footprint": "Capacitor_SMD:C_0603_1608Metric",
+      "explanation": "Crystal load capacitor (other side) paired with C3 for Y1; matching 18pF values is a typical default for a balanced crystal network.",
+      "pins": {
+        "1": {
+          "name": "~",
+          "pos": [
+            190.0,
+            146.19,
+            270
+          ]
+        },
+        "2": {
+          "name": "~",
+          "pos": [
+            190.0,
+            153.81,
+            90
           ]
         }
       }

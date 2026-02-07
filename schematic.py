@@ -314,3 +314,27 @@ def draw_nets(sch_path: str | Path, llm_output1: dict[str, Any], llm_output2: di
         for c in conns[1:]:
             px, py = get_pin_xy(llm_output1, c["ref"], c["pin"])
             draw_wire(sch_path, [(ax, ay), (px, py)])
+
+def clear_schematic(sch_path: str | Path) -> None:
+    sch_path = Path(sch_path)
+    text = sch_path.read_text(encoding="utf-8")
+
+    root_uuid = _find_root_uuid(text)
+
+    cleared = f'''(kicad_sch
+        \t(version 20250114)
+        \t(generator "eeschema")
+        \t(generator_version "9.0")
+        \t(uuid "{root_uuid}")
+        \t(paper "A4")
+        \t(lib_symbols)
+        \t(sheet_instances
+        \t\t(path "/"
+        \t\t\t(page "1")
+        \t\t)
+        \t)
+        \t(embedded_fonts no)
+        )
+    '''
+
+    sch_path.write_text(cleared, encoding="utf-8")

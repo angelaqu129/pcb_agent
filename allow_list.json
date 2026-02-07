@@ -51,9 +51,24 @@
       "footprint": "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.7x3.7mm"
     },
 
-    { "lib": "power.kicad_sym", "symbol": "+5V", "ref": "#PWR" },
-    { "lib": "power.kicad_sym", "symbol": "+3V3", "ref": "#PWR" },
-    { "lib": "power.kicad_sym", "symbol": "GND", "ref": "#PWR" },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "+5V",
+      "ref": "#PWR",
+      "footprint": ""
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "+3V3",
+      "ref": "#PWR",
+      "footprint": ""
+    },
+    {
+      "lib": "power.kicad_sym",
+      "symbol": "GND",
+      "ref": "#PWR",
+      "footprint": ""
+    },
 
     {
       "lib": "Connector_Generic.kicad_sym",

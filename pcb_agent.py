@@ -18,6 +18,7 @@ from dedalus_labs import AsyncDedalus, DedalusRunner
 from schematic import (
     place_from_llm_output,
     add_pin_outs,
+    clear_schematic,
 )
 
 load_dotenv()
@@ -118,14 +119,27 @@ class PCBAgent:
             Dictionary with status, components, nets, and file paths
         """
         sch_path = Path(schematic_path)
-        
+        clear_schematic(sch_path)
         try:
             # ============================================================
-            # PHASE 1: Component Selection (LLM)
+            # STAGE 0: Component Filtering (Fast LLM)
             # ============================================================
-            self.log("Starting component selection", phase=1)
+            self.log("Pre-filtering components from allowlist", phase=0)
+            filtered_allowlist = await self._stage0_filter_components(
+                user_prompt
+            )
+            self.log(
+                f"Filtered to {len(filtered_allowlist)} relevant components "
+                f"(from {self._get_total_components()} total)",
+                phase=0
+            )
+            
+            # ============================================================
+            # PHASE 1: Component Selection (LLM with filtered list)
+            # ============================================================
+            self.log("Starting component selection with filtered list", phase=1)
             llm_output1 = await self._phase1_component_selection(
-                user_prompt, model
+                user_prompt, model, filtered_allowlist
             )
             
             # Save llm_output1.json
@@ -209,17 +223,105 @@ class PCBAgent:
                 "message": "Workflow failed. Check logs for details."
             }
     
+    def _get_total_components(self) -> int:
+        """Get total number of components in allowlist."""
+        with self.allow_list_path.open("r", encoding="utf-8") as f:
+            allow_list_data = json.load(f)
+        return len(allow_list_data.get("allowlist", []))
+    
+    async def _stage0_filter_components(
+        self,
+        user_prompt: str,
+        filter_model: str = "openai/gpt-4o"
+    ) -> List[Dict[str, Any]]:
+        """
+        Stage 0: Pre-filter components using fast LLM.
+        
+        Args:
+            user_prompt: User's circuit description
+            filter_model: Fast model for filtering (default: gpt-4o-mini)
+        
+        Returns:
+            Filtered list of relevant components
+        """
+        # Load full allowlist
+        with self.allow_list_path.open("r", encoding="utf-8") as f:
+            allow_list_data = json.load(f)
+        
+        full_allowlist = allow_list_data.get("allowlist", [])
+        
+        # Build filtering prompt
+        filter_prompt = f"""You are a component selector for PCB design.
+
+Task: Select ONLY the components needed for this circuit from the allowlist.
+
+User Request: "{user_prompt}"
+
+Available Components:
+{json.dumps(full_allowlist, indent=2)}
+
+Instructions:
+1. Analyze the user request carefully
+2. Select all components needed
+3. Always include power symbols if circuit needs power (GND, +5V, +3V3)
+4. Only include components that are directly relevant
+5. Return JSON with selected components and reasoning
+
+Output Format (JSON only):
+{{
+  "selected": [
+    {{"lib": "...", "symbol": "...", "ref": "...", "footprint": "...", "reason": "why needed"}},
+    ...
+  ]
+}}
+
+Rules:
+- Include power symbols for any powered circuit
+- Be conservative - only select what's truly needed
+- Return valid JSON only
+"""
+        
+        self.log(f"Calling filtering LLM (model: {filter_model})", phase=0)
+        
+        # Call fast LLM for filtering
+        kwargs = {"input": filter_prompt, "model": filter_model}
+        if filter_model.startswith("openai/"):
+            kwargs["response_format"] = {"type": "json_object"}
+        
+        response = await self.runner.run(**kwargs)
+        
+        # Parse response
+        try:
+            result = json.loads(response.final_output)
+            selected = result.get("selected", [])
+            
+            if not selected:
+                self.log("Warning: No components selected, using full allowlist", phase=0)
+                return full_allowlist
+            
+            # Log filtered components
+            component_names = [c.get("symbol", "?") for c in selected]
+            self.log(f"Selected components: {', '.join(component_names)}", phase=0)
+            
+            return selected
+            
+        except json.JSONDecodeError as e:
+            self.log(f"Warning: Filter LLM returned invalid JSON, using full allowlist", phase=0)
+            return full_allowlist
+    
     async def _phase1_component_selection(
         self,
         user_prompt: str,
-        model: str
+        model: str,
+        filtered_allowlist: List[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Phase 1: LLM selects components from allowlist.
+        Phase 1: LLM selects components from filtered allowlist.
         
         Args:
             user_prompt: User's circuit description
             model: LLM model to use
+            filtered_allowlist: Pre-filtered component list
         
         Returns:
             Component list JSON (llm_output1)
@@ -232,9 +334,9 @@ class PCBAgent:
         with self.prompt1_path.open("r", encoding="utf-8") as f:
             prompt1_template = f.read()
         
-        # Build complete prompt
+        # Build complete prompt with filtered allowlist
         input_data = {
-            "allowlist": allow_list_data.get("allowlist", []),
+            "allowlist": filtered_allowlist,
             "canvas": allow_list_data.get("canvas", {}),
             "request": user_prompt
         }
@@ -404,7 +506,6 @@ class PCBAgent:
 async def main():
     """Example usage of PCBAgent."""
     import sys
-    
     # Get user prompt from command line or use default
     if len(sys.argv) > 1:
         user_prompt = " ".join(sys.argv[1:])
