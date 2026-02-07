@@ -29,20 +29,25 @@ function App() {
 
     setIsGenerating(true);
     try {
-      // Call the backend to generate schematic
-      const result = await window.electronAPI.generateSchematic({
-        prompt,
-        projectPath,
+      // Call Flask backend generate endpoint
+      const response = await fetch("http://localhost:5001/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
       });
 
-      // Export to SVG for preview
-      if (currentFile) {
-        const svgResult =
-          await window.electronAPI.exportSchematicSVG(currentFile);
-        setSchematicSVG(svgResult.svgContent);
-      }
+      const result = await response.json();
+      console.log("Generate result:", result);
 
-      alert("Schematic generated successfully!");
+      if (result.success) {
+        alert(
+          `Schematic generated successfully!\nPrompt: ${result.prompt}\nComponents: ${result.components.length}`,
+        );
+      } else {
+        alert("Generation failed: " + result.message);
+      }
     } catch (error) {
       console.error("Error generating schematic:", error);
       alert("Error generating schematic: " + error.message);
