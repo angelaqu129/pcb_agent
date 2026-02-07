@@ -104,7 +104,7 @@ class PCBAgent:
     async def generate_schematic(
         self,
         user_prompt: str,
-        schematic_path: str = "/Users/adityarao/Documents/KiCad/9.0/projects/test/test.kicad_sch",
+        directory_path: str,
         model: str = "openai/gpt-5.2"
     ) -> Dict[str, Any]:
         """
@@ -119,13 +119,22 @@ class PCBAgent:
         
         Args:
             user_prompt: Natural language circuit description
-            schematic_path: Output path for KiCAD schematic file
+            directory_path: Directory containing .kicad_sch file
             model: LLM model to use (default: Claude Sonnet)
         
         Returns:
             Dictionary with status, components, nets, and file paths
         """
-        sch_path = Path(schematic_path)
+        # Find .kicad_sch file in directory_path
+        dir_path = Path(directory_path)
+        sch_files = list(dir_path.glob("*.kicad_sch"))
+        
+        if not sch_files:
+            raise FileNotFoundError(f"No .kicad_sch file found in {directory_path}")
+        
+        sch_path = sch_files[0]  # Use first .kicad_sch file found
+        self.log(f"Found schematic file: {sch_path}")
+        
         clear_schematic(sch_path)
         try:
             # ============================================================
