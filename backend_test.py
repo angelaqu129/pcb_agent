@@ -20,29 +20,52 @@ def hello_world():
 
 @app.route('/api/generate', methods=['POST'])
 def generate():
-    """Test endpoint for schematic generation."""
+    """Generate schematic using PCB Agent Stage 0 (Component Filtering)."""
     from flask import request
+    import asyncio
+    import sys
+    import os
+    
+    # Add parent directory to path for imports
+    sys.path.insert(0, os.path.dirname(__file__))
     
     data = request.get_json()
     prompt = data.get('prompt', '')
     
-    return jsonify({
-        'success': True,
-        'message': f'Received prompt: {prompt}',
-        'prompt': prompt,
-        'components': [
-            {
-                'name': 'Test Component 1',
-                'type': 'resistor',
-                'value': '10k'
-            },
-            {
-                'name': 'Test Component 2',
-                'type': 'led',
-                'value': 'red'
-            }
-        ]
-    })
+    if not prompt:
+        return jsonify({
+            'success': False,
+            'error': 'No prompt provided'
+        }), 400
+    
+    try:
+        # Import PCBAgent
+        from pcb_agent import PCBAgent
+        
+        # Run Stage 0 asynchronously
+        async def run_stage0():
+            agent = PCBAgent(verbose=True)
+            filtered_components = await agent._stage0_filter_components(prompt)
+            return filtered_components
+        
+        # Execute async function
+        filtered_components = asyncio.run(run_stage0())
+        
+        return jsonify({
+            'success': True,
+            'message': f'Filtered components for: {prompt}',
+            'prompt': prompt,
+            'components': filtered_components,
+            'count': len(filtered_components)
+        })
+        
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
 
 if __name__ == '__main__':
     print("=" * 50)
