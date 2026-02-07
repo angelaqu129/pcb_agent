@@ -1,8 +1,33 @@
 from pathlib import Path
+import json
 import subprocess
 import pcbnew
 import wx
 app = wx.App()
+
+
+def place_footprints_from_schematic(board: pcbnew.BOARD, llm_output1: dict):
+    """
+    Place each footprint at the same position and rotation as in the schematic.
+    llm_output1["symbols"] entries have ref_des and at: { x, y, rot } (mm and degrees).
+    """
+    ref_to_fp = {fp.GetReference(): fp for fp in board.GetFootprints()}
+    for sym in llm_output1.get("symbols", []):
+        ref_des = sym.get("ref_des")
+        at = sym.get("at")
+        if not ref_des or not at:
+            continue
+        fp = ref_to_fp.get(ref_des)
+        if fp is None:
+            continue
+        x_mm, y_mm = at.get("x", 0), at.get("y", 0)
+        rot_deg = at.get("rot", 0)
+        x_iu = pcbnew.FromMM(x_mm)
+        y_iu = pcbnew.FromMM(y_mm)
+        fp.SetPosition(pcbnew.VECTOR2I(int(x_iu), int(y_iu)))
+        fp.SetOrientationDegrees(rot_deg)
+    print("Placed footprints from schematic.")
+
 
 def get_footprint_bounds(board: pcbnew.BOARD):
     min_x = min_y = None
@@ -156,8 +181,8 @@ def autoroute_with_freerouting(board: pcbnew.BOARD, project_dir: Path, timeout_s
     print("Routing imported successfully")
 
 
-def main(project_path_str: str):
-    """Main function to process PCB layout."""
+def main(project_path_str: str, llm_output1_path_arg: str | None = None):
+    """Main function to process PCB layout. If llm_output1_path_arg is set and exists, place footprints from schematic; else relayout with min spacing."""
     project_path = Path(project_path_str)
     print("project_path:", project_path)
     # Find .kicad_pcb file in directory
@@ -170,7 +195,13 @@ def main(project_path_str: str):
     print(f"Found PCB file: {pcb_path}")
     board = pcbnew.LoadBoard(str(pcb_path))
 
-    relayout_footprints_min_spacing(board, min_spacing_mm=2.0)
+    llm_output1_path = llm_output1_path_arg if llm_output1_path_arg else None
+    if llm_output1_path and Path(llm_output1_path).exists():
+        with open(llm_output1_path, "r", encoding="utf-8") as f:
+            llm_output1 = json.load(f)
+        place_footprints_from_schematic(board, llm_output1)
+    else:
+        relayout_footprints_min_spacing(board, min_spacing_mm=2.0)
 
     bounds = get_footprint_bounds(board)
     print(bounds)
@@ -182,4 +213,5 @@ def main(project_path_str: str):
 if __name__ == "__main__":
     import sys
     project_path = sys.argv[1] if len(sys.argv) > 1 else None
-    main(project_path)
+    llm_output1_path = sys.argv[2] if len(sys.argv) > 2 else None
+    main(project_path, llm_output1_path)

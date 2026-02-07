@@ -122,9 +122,12 @@ def generate_pcb():
     
     try:
         pcb_script = os.path.join(os.path.dirname(__file__), 'pcb.py')
-        
+        llm_output1_path = os.path.join(os.path.dirname(__file__), 'out', 'llm_output1.json')
+        cmd = [KICAD_PYTHON, pcb_script, directory]
+        if os.path.isfile(llm_output1_path):
+            cmd.append(llm_output1_path)
         result = subprocess.run(
-            [KICAD_PYTHON, pcb_script, directory],
+            cmd,
             capture_output=False, text=True, timeout=300
         )
         
