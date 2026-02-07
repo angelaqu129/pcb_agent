@@ -156,10 +156,9 @@ def autoroute_with_freerouting(board: pcbnew.BOARD, project_dir: Path, timeout_s
     print("Routing imported successfully")
 
 KICAD_PYTHON = "/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3"
-project_path = Path("/Users/adityarao/Documents/KiCad/9.0/projects/test/")
+project_path = Path("/Users/angelaqu/Desktop/test/")
 sch_path = project_path / "test.kicad_sch"
 pcb_path = project_path / "test.kicad_pcb"
-freerouting_jar = Path("/Users/adityarao/code/kicad-test/freerouting-1.9.0.jar")
 board = pcbnew.LoadBoard(str(pcb_path))
 
 relayout_footprints_min_spacing(board, min_spacing_mm=2.0)
